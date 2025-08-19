@@ -1,4 +1,4 @@
-import { Routine, NewRoutine } from "@/types/routine";
+import { Routine, NewRoutine } from "@/types/routineType";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Edit } from "lucide-react";

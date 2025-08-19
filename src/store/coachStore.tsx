@@ -1,5 +1,5 @@
-import { Athlete } from "@/types/athlete";
-import { Coach } from "@/types/coach";
+import { Athlete } from "@/types/athleteType";
+import { Coach } from "@/types/coachType";
 import { create } from "zustand";
 
 type CoachStore = {

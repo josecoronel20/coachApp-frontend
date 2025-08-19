@@ -4,16 +4,19 @@ import { useState } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
-import { RegisterData } from '@/types/auth';
+import { CredentialsRegister } from '@/types/authType';
 import Image from 'next/image';
+import { registerUser } from '@/app/api/auth';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register, handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(false);
-
-  const onSubmit = async (data: RegisterData) => {
+  const router = useRouter();
+  //todo: add zod validation
+  const onSubmit = async (data: CredentialsRegister) => {
     if (data.password !== data.confirmPassword) {
       alert('Las contraseñas no coinciden');
       return;
@@ -21,13 +24,22 @@ export default function RegisterPage() {
     
     setIsLoading(true);
     
-    // Aquí iría la lógica de registro
-    console.log('Register attempt:', data);
+    const response = await registerUser({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      confirmPassword: data.confirmPassword
+    });
+
     
-    // Simular delay de API
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    if (response.status === 200) {
+      alert("Cuenta creada correctamente");
+      router.push("/auth/login");
+    } else {
+      alert("Error al crear la cuenta");
+    }
+
+    setIsLoading(false);
   };
 
   return (

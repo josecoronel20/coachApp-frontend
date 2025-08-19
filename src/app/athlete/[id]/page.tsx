@@ -4,7 +4,7 @@
 import { Loader2 } from "lucide-react";
 import { AthleteView } from "./athleteComponent/Athlete-view";
 import { useAthleteStore } from "@/store/athleteStore";
-import { Athlete } from "@/types/athlete";
+import { Athlete } from "@/types/athleteType";
 import { useEffect } from "react";
 
 export default function AthletePage() {

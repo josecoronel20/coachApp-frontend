@@ -1,6 +1,6 @@
 "use client";
 import { useCoachStore } from "@/store/coachStore";
-import { Athlete } from "@/types/athlete";
+import { Athlete } from "@/types/athleteType";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

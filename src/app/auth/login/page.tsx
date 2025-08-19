@@ -1,133 +1,133 @@
 "use client";
 
 import { useState } from "react";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { LoginData } from "@/types/auth";
+import { CredentialsLogin } from "@/types/authType";
 import Image from "next/image";
+import { loginUser } from "@/app/api/auth";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
   const { register, handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = async (data: LoginData) => {
+  const onSubmit = async (data: CredentialsLogin) => {
     setIsLoading(true);
 
-    // Aquí iría la lógica de autenticación
-    console.log("Login attempt:", data);
+    const response = await loginUser({
+      email: data.email,
+      password: data.password,
+    });
 
-    // Simular delay de API
-    setTimeout(() => {
+    if (response.status === 200) {
+      alert("Login successful");
+      router.push("/dashboard");
+    } else {
+      alert(response.statusText);
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center">
             <Image src="/logo.png" alt="Logo" width={48} height={48} />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <CardTitle className="text-2xl font-bold">
             Iniciar sesión
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          </CardTitle>
+          <CardDescription>
             Accede a tu cuenta de entrenador
-          </p>
-        </div>
-
-        {/* Form */}
-        <form
-          className="mt-8 space-y-6"
-          onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
-        >
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <form
+            className="space-y-4"
+            onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="email">
                 Correo electrónico
-              </label>
-              <input
+              </Label>
+              <Input
                 id="email"
                 type="email"
                 autoComplete="email"
                 required
                 {...register("email")}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="tu@email.com"
+                className="w-full"
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+            <div className="space-y-2">
+              <Label htmlFor="password">
                 Contraseña
-              </label>
+              </Label>
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   {...register("password")}
-                  className="appearance-none relative block w-full px-3 py-3 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                   placeholder="••••••••"
+                  className="w-full pr-10"
                 />
-                <button
+                <Button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-4 w-4 text-muted-foreground" />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
-          </div>
 
-          <div>
-            <Link href="/dashboard">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Iniciando sesión...
-                  </div>
-                ) : (
-                  "Iniciar sesión"
-                )}
-              </button>
-            </Link>
-          </div>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Iniciando sesión...
+                </div>
+              ) : (
+                "Iniciar sesión"
+              )}
+            </Button>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <div className="text-center text-sm text-muted-foreground">
               ¿No tienes cuenta?{" "}
               <Link
                 href="/auth/register"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-primary hover:text-primary/80 underline-offset-4 hover:underline"
               >
                 Regístrate aquí
               </Link>
-            </p>
-          </div>
-        </form>
-      </div>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

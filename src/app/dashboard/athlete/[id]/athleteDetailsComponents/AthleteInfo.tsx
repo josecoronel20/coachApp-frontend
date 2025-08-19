@@ -1,5 +1,5 @@
 "use client";
-import { Athlete } from "@/types/athlete";
+import { Athlete } from "@/types/athleteType";
 import { FileText, Edit, Save, X } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";

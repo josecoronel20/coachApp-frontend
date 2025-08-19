@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Plus, Save } from "lucide-react";
 import Link from "next/link";
-import { NewRoutine } from "@/types/routine";
+import { NewRoutine } from "@/types/routineType";
 import { useForm } from "react-hook-form";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
 

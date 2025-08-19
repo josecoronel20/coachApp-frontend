@@ -10,8 +10,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCoachStore } from "@/store/coachStore";
-import { RoutineDay } from "@/types/routine";
-import { Exercise } from "@/types/routine";
+import { RoutineDay } from "@/types/routineType";
+import { Exercise } from "@/types/routineType";
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

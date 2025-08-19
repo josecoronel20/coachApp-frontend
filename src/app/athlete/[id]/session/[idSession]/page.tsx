@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useAthleteStore } from "@/store/athleteStore";
-import { Athlete } from "@/types/athlete";
+import { Athlete } from "@/types/athleteType";
 import { useState, useEffect } from "react";
 import { ChevronDown, Info, CheckCircle, MessageSquare } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";

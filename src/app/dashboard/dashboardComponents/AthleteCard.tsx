@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import type { Athlete } from "@/types/athlete";
+import type { Athlete } from "@/types/athleteType";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 

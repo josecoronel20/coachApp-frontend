@@ -1,5 +1,5 @@
 import { useCoachStore } from "@/store/coachStore";
-import { Athlete } from "@/types/athlete";
+import { Athlete } from "@/types/athleteType";
 import React, { useEffect, useState } from "react";
 import { AthleteCard } from "./AthleteCard";
 
