@@ -33,16 +33,21 @@ export const loginUser = async ({ email, password }: CredentialsLogin) => {
     }
   );
 
-  if (!response.ok) {
-    throw new Error("Failed to login");
-  }
-
   return response;
 };
 
 export const logoutUser = async () => {
-  const response = await fetch(`${API_URL}/auth/logout`, {
+  const response = await fetch(`${API_URL}/api/auth/logout`, {
     method: "POST",
+    credentials: "include",
+  });
+
+  return response;
+};
+
+export const isAuthenticated = async () => {
+  const response = await fetch(`${API_URL}/api/auth/isAuthenticated`, {
+    method: "GET",
     credentials: "include",
   });
 

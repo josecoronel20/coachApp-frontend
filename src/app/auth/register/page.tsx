@@ -1,162 +1,167 @@
 'use client';
 
 import { useState } from 'react';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { CredentialsRegister } from '@/types/authType';
 import Image from 'next/image';
 import { registerUser } from '@/app/api/auth';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
   const { register, handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  //todo: add zod validation
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const onSubmit = async (data: CredentialsRegister) => {
+    setIsLoading(true);
+    setError(null);
+
     if (data.password !== data.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      setError('Las contraseñas no coinciden');
+      setIsLoading(false);
       return;
     }
     
-    setIsLoading(true);
-    
-    const response = await registerUser({
-      email: data.email,
-      password: data.password,
-      name: data.name,
-      confirmPassword: data.confirmPassword
-    });
+    try {
+      const response = await registerUser({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        confirmPassword: data.confirmPassword
+      });
 
-    
-    if (response.status === 200) {
-      alert("Cuenta creada correctamente");
-      router.push("/auth/login");
-    } else {
-      alert("Error al crear la cuenta");
+      const responseData = await response.json();
+
+      if (response.status !== 200) {
+        setError(responseData.message || 'Error al crear la cuenta');
+      } else {
+        router.push("/auth/login");
+      }
+    } catch (error) {
+      setError('Error al crear la cuenta');
     }
 
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center">
             <Image src="/logo.png" alt="Logo" width={48} height={48} />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Crear cuenta
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <CardTitle className="text-2xl font-bold">Crear cuenta</CardTitle>
+          <CardDescription>
             Únete a CoachApp y comienza a gestionar tus rutinas
-          </p>
-        </div>
+          </CardDescription>
+        </CardHeader>
 
-        {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}>
-          <div className="space-y-4">
-            {/* Nombre y Apellido */}
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre
-                </label>
-                <input
-                  type="text"
-                  autoComplete="given-name"
-                  required
-                  {...register('name')}
-                  className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Tu nombre"
-                />
-              </div>
+        <CardContent>
+          <form
+            className="space-y-4"
+            onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre</Label>
+              <Input
+                id="name"
+                type="text"
+                autoComplete="given-name"
+                required
+                {...register('name')}
+                placeholder="Tu nombre"
+                className="w-full"
+              />
+            </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Correo electrónico
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input
                 id="email"
                 type="email"
                 autoComplete="email"
                 required
                 {...register('email')}
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="tu@email.com"
+                className="w-full"
               />
             </div>
 
-            {/* Contraseña */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Contraseña
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
                   {...register('password')}
-                  className="appearance-none relative block w-full px-3 py-3 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                   placeholder="••••••••"
+                  className="w-full pr-10"
                 />
-                <button
+                <Button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-4 w-4 text-muted-foreground" />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
 
-            {/* Confirmar Contraseña */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirmar contraseña
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
               <div className="relative">
-                <input
+                <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
                   {...register('confirmPassword')}
-                  className="appearance-none relative block w-full px-3 py-3 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                   placeholder="••••••••"
+                  className="w-full pr-10"
                 />
-                <button
+                <Button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-4 w-4 text-muted-foreground" />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
+            {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -165,19 +170,20 @@ export default function RegisterPage() {
               ) : (
                 'Crear cuenta'
               )}
-            </button>
-          </div>
+            </Button>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <div className="text-center text-sm text-muted-foreground">
               ¿Ya tienes cuenta?{' '}
-              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link
+                href="/auth/login"
+                className="font-medium text-primary hover:text-primary/80 underline-offset-4 hover:underline"
+              >
                 Inicia sesión aquí
               </Link>
-            </p>
-          </div>
-        </form>
-      </div>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

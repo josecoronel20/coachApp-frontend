@@ -9,8 +9,10 @@ import Link from "next/link";
 import { NewRoutine } from "@/types/routineType";
 import { useForm } from "react-hook-form";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
+import { useMiddleware } from "@/hooks/useMiddleware";
 
 const NewAthletePage = () => {
+  useMiddleware();
   const { register, watch } = useForm({
     defaultValues: {
       name: "",

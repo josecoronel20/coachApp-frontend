@@ -1,5 +1,6 @@
 "use client";
 
+import { logoutUser } from "@/app/api/auth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,11 +10,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCoachStore } from "@/store/coachStore";
 import { LogOut, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const UserMenuBtn = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { coachInfo } = useCoachStore();
+  const { coachInfo } = useCoachStore()
+  const router = useRouter();
+
+  const logout = async () => {
+    const response = await logoutUser();
+    if (response.status === 200) {
+      router.push("/auth/login");
+    }
+  };
 
   return (
     <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen}>
@@ -28,9 +38,9 @@ const UserMenuBtn = () => {
         <span className="text-sm text-muted-foreground">{coachInfo?.email}</span>
 
         <DropdownMenuItem className="cursor-pointer">
-          <span className="flex items-center gap-2">
+          <Button variant="ghost" className="flex items-center gap-2" onClick={() => logout()}>
             <LogOut className="h-4 w-4" /> Cerrar sesión
-          </span>
+          </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

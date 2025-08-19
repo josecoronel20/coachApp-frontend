@@ -14,8 +14,10 @@ import Link from "next/link";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
 import PaymentSection from "./athleteDetailsComponents/PaymentSection";
 import AthleteInfo from "./athleteDetailsComponents/AthleteInfo";
+import { useMiddleware } from "@/hooks/useMiddleware";
 
 const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
+  useMiddleware();
   const { id } = React.use(params);
   const { athletesInfo } = useCoachStore();
 

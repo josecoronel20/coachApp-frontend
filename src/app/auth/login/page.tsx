@@ -10,7 +10,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export default function LoginPage() {
@@ -18,22 +24,19 @@ export default function LoginPage() {
   const { register, handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: CredentialsLogin) => {
     setIsLoading(true);
+    const response = await loginUser(data);
+    const responseData = await response.json();
 
-    const response = await loginUser({
-      email: data.email,
-      password: data.password,
-    });
-
-    if (response.status === 200) {
-      alert("Login successful");
-      router.push("/dashboard");
+    if (response.status !== 200) {
+      setError(responseData.message || "Error desconocido");
     } else {
-      alert(response.statusText);
-      setIsLoading(false);
+      router.push("/dashboard");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -43,23 +46,17 @@ export default function LoginPage() {
           <div className="flex justify-center">
             <Image src="/logo.png" alt="Logo" width={48} height={48} />
           </div>
-          <CardTitle className="text-2xl font-bold">
-            Iniciar sesión
-          </CardTitle>
-          <CardDescription>
-            Accede a tu cuenta de entrenador
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">Iniciar sesión</CardTitle>
+          <CardDescription>Accede a tu cuenta de entrenador</CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <form
             className="space-y-4"
             onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
           >
             <div className="space-y-2">
-              <Label htmlFor="email">
-                Correo electrónico
-              </Label>
+              <Label htmlFor="email">Correo electrónico</Label>
               <Input
                 id="email"
                 type="email"
@@ -72,9 +69,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">
-                Contraseña
-              </Label>
+              <Label htmlFor="password">Contraseña</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -99,13 +94,11 @@ export default function LoginPage() {
                   )}
                 </Button>
               </div>
+
+              {error && <div className="text-red-500 text-sm text-center">{error}</div>}
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

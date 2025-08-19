@@ -4,9 +4,12 @@ import Image from "next/image";
 import FeedbackBtn from "./FeedbackBtn";
 import PaymentsBtn from "./PaymentsBtn";
 import UserMenuBtn from "./UserMenuBtn";
+import { useCoachInfo } from "@/hooks/useCoachInfo";
 
 
 export default function Header() {
+  const { data, error, isLoading } = useCoachInfo();
+  console.log("data", data);
   return (
     <header className="fixed top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 w-full justify-between">
       {/* Logo and name */}
