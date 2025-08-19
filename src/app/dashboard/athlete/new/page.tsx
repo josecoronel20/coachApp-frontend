@@ -4,21 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Plus, Save } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ArrowLeft, Plus, Save, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import { NewRoutine } from "@/types/routineType";
 import { useForm } from "react-hook-form";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
-import { useMiddleware } from "@/hooks/useMiddleware";
+import { NewAthlete } from "@/types/athleteType";
+import createNewAthlete from "@/app/api/coach";
+import { useRouter } from "next/navigation";
 
 const NewAthletePage = () => {
-  useMiddleware();
-  const { register, watch } = useForm({
+  const router = useRouter();
+  const { register, watch } = useForm<NewAthlete>({
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      routine: "",
+      routine: [],
       coachId: "",
       paymentDate: "",
     },
@@ -26,8 +34,12 @@ const NewAthletePage = () => {
 
   const formValues = watch();
   const [isRoutineParsed, setIsRoutineParsed] = useState(false);
-  // const [selectedDay, setSelectedDay] = useState(0);
   const [routine, setRoutine] = useState<NewRoutine>([]);
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogData, setDialogData] = useState<{
+    isSuccess: boolean;
+    message: string;
+  }>({ isSuccess: false, message: "" });
 
   // Rutina simulada que se generará al presionar "Transformar rutina"
   const mockParsedRoutine: NewRoutine = [
@@ -62,8 +74,6 @@ const NewAthletePage = () => {
     ],
   ];
 
-
-
   const handleTransformRoutine = () => {
     // Simular el proceso de parseo con la API de OpenAI
     console.log("Transformando rutina:", formValues.routine);
@@ -75,9 +85,31 @@ const NewAthletePage = () => {
     }, 1000);
   };
 
-  const handleCreateAthlete = () => {
-    // Aquí iría la lógica para crear el atleta
-    console.log("Creando atleta:", { ...formValues, routine });
+  const handleCreateAthlete = async (data: NewAthlete) => {
+    try {
+      const response = await createNewAthlete(data);
+      const responseData = await response.json();
+      
+      const isSuccess = response.status === 201;
+      setDialogData({
+        isSuccess,
+        message: responseData.message 
+      });
+      setShowDialog(true);
+      
+      if (isSuccess) {
+        // Redirect to dashboard after successful creation
+        setTimeout(() => {
+          router.push(`/dashboard/athlete/${responseData.athlete.id}`);
+        }, 2000);
+      }
+    } catch (error) {
+      setDialogData({
+        isSuccess: false,
+        message: "Error de conexión"
+      });
+      setShowDialog(true);
+    }
   };
 
   return (
@@ -95,7 +127,7 @@ const NewAthletePage = () => {
         </div>
 
         <Button
-          onClick={handleCreateAthlete}
+          onClick={() => handleCreateAthlete(formValues as NewAthlete)}
           className="bg-primary hover:bg-primary/90 w-full"
           disabled={!isRoutineParsed}
         >
@@ -166,7 +198,7 @@ const NewAthletePage = () => {
                   <Button
                     onClick={handleTransformRoutine}
                     className="w-full bg-primary hover:bg-primary/90"
-                    disabled={!formValues.routine.trim()}
+                    disabled={!formValues.routine.length}
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Transformar Rutina
@@ -179,6 +211,31 @@ const NewAthletePage = () => {
           </Card>
         </div>
       </div>
+
+      {/* Status Dialog */}
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {dialogData.isSuccess ? (
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              ) : (
+                <XCircle className="h-5 w-5 text-red-600" />
+              )}
+              {dialogData.isSuccess ? "Éxito" : "Error"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className={`p-4 rounded-lg ${
+            dialogData.isSuccess 
+              ? "bg-green-50 border border-green-200 text-green-800" 
+              : "bg-red-50 border border-red-200 text-red-800"
+          }`}>
+            <p className="text-sm font-medium">
+              {dialogData.message}
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };

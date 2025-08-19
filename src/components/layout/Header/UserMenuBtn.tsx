@@ -8,15 +8,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCoachStore } from "@/store/coachStore";
+import { useCoachInfo } from "@/hooks/useCoachInfo";
 import { LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const UserMenuBtn = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { coachInfo } = useCoachStore()
   const router = useRouter();
+  const { data: coachInfo, error, isLoading } = useCoachInfo();
 
   const logout = async () => {
     const response = await logoutUser();

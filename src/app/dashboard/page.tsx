@@ -4,11 +4,9 @@ import { SearchBar } from "./dashboardComponents/Searchbar";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import AthleteList from "./dashboardComponents/AthleteList";
-import { useMiddleware } from "@/hooks/useMiddleware";
 
 const DashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  useMiddleware();
 
   return (
     <main className="flex flex-col min-h-screen pt-16 p-1">
