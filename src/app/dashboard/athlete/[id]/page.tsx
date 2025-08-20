@@ -1,7 +1,6 @@
 "use client";
-import { useCoachStore } from "@/store/coachStore";
 import { Athlete } from "@/types/athleteType";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,22 +13,13 @@ import Link from "next/link";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
 import PaymentSection from "./athleteDetailsComponents/PaymentSection";
 import AthleteInfo from "./athleteDetailsComponents/AthleteInfo";
-import { getAthleteInfo } from "@/app/api/coach";
+import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
 
 const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
-  const [athlete, setAthlete] = useState<Athlete | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading, mutate } = useGetAthleteInfo(id);
+  const athlete = data as Athlete;
 
-  useEffect(() => {
-    const fetchAthleteInfo = async () => {
-      const response = await getAthleteInfo(id);
-      const responseData = await response.json();
-      setAthlete(responseData as Athlete);
-      setIsLoading(false);
-    };
-    fetchAthleteInfo();
-  }, [id]);
 
   // If athlete is not found, show error message
   if (isLoading || !athlete) {
@@ -111,15 +101,7 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
                 <PaymentSection
                   paymentDate={athlete.paymentDate}
                   athleteId={athlete.id}
-                  onPaymentUpdate={(newDate) => {
-                    // TODO: Implement actual payment update logic
-                    console.log(
-                      "Payment updated for athlete:",
-                      athlete.id,
-                      "New date:",
-                      newDate
-                    );
-                  }}
+                  mutate={mutate}
                 />
               </CardContent>
             </Card>

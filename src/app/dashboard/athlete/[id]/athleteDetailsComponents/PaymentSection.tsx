@@ -1,17 +1,23 @@
+"use client";
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { updatePaymentDate } from "@/app/api/protected";
+import { KeyedMutator } from "swr";
+import { Athlete } from "@/types/athleteType";
 
 interface PaymentSectionProps {
   paymentDate: string;
   athleteId: string;
+  mutate: KeyedMutator<Athlete>;
 }
 
 const PaymentSection = ({
   paymentDate,
   athleteId,
+  mutate,
 }: PaymentSectionProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -81,8 +87,7 @@ const PaymentSection = ({
     const response = await updatePaymentDate(athleteId, currentDate);
 
     if (response.ok) {
-      const responseData = await response.json();
-      console.log(responseData);
+      mutate();
     }
 
     setIsUpdating(false);
