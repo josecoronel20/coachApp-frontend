@@ -14,4 +14,23 @@ const createNewAthlete = async (data: NewAthlete) => {
     return response;
 };
 
-export default createNewAthlete;
+const getAthleteInfo = async (id: string) => {
+    const response = await fetch(`${API_URL}/api/coach/getAthleteInfo/${id}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return response;
+};
+
+const getAllAthletes = async () => {
+    const response = await fetch(`${API_URL}/api/coach/getAllAthletes`, {
+        method: "GET",
+        credentials: "include",
+    });
+    return response;
+};
+
+export { createNewAthlete, getAthleteInfo, getAllAthletes };

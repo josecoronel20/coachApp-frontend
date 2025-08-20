@@ -1,7 +1,7 @@
 "use client";
 import { useCoachStore } from "@/store/coachStore";
 import { Athlete } from "@/types/athleteType";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,15 +14,25 @@ import Link from "next/link";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
 import PaymentSection from "./athleteDetailsComponents/PaymentSection";
 import AthleteInfo from "./athleteDetailsComponents/AthleteInfo";
+import { getAthleteInfo } from "@/app/api/coach";
 
 const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
-  const { athletesInfo } = useCoachStore();
+  const [athlete, setAthlete] = useState<Athlete | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const athlete = athletesInfo?.find((athlete: Athlete) => athlete.id === id);
+  useEffect(() => {
+    const fetchAthleteInfo = async () => {
+      const response = await getAthleteInfo(id);
+      const responseData = await response.json();
+      setAthlete(responseData as Athlete);
+      setIsLoading(false);
+    };
+    fetchAthleteInfo();
+  }, [id]);
 
   // If athlete is not found, show error message
-  if (!athlete) {
+  if (isLoading || !athlete) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

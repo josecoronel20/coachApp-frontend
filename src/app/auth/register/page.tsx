@@ -18,8 +18,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { useMiddleware } from '@/hooks/useMiddleware';
 
 export default function RegisterPage() {
+  useMiddleware();
   const router = useRouter();
   const { register, handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(false);

@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "./dashboardComponents/Searchbar";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AthleteList from "./dashboardComponents/AthleteList";
 
 const DashboardPage = () => {

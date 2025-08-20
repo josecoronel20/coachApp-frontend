@@ -14,6 +14,10 @@ const router = useRouter();
         if (currentPath !== "/auth/login" && currentPath !== "/auth/register") {
           router.push("/auth/login");
         }
+      }else{
+        if (currentPath === "/auth/login" || currentPath === "/auth/register") {
+          router.push("/");
+        }
       }
     };
     checkAuth();

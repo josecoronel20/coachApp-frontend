@@ -9,21 +9,29 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCoachStore } from "@/store/coachStore";
+import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
+import { Athlete } from "@/types/athleteType";
 import { RoutineDay } from "@/types/routineType";
 import { Exercise } from "@/types/routineType";
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+interface FeedbackItem {
+  athleteId: string;
+  athleteName: string;
+  exerciseName: string;
+  feedback: string;
+}
+
 const FeedbackBtn = () => {
-  const { athletesInfo } = useCoachStore();
+  const { athletes } = useGetAllAthletes();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // Count the number of feedbacks
   const feedbackCount =
-    athletesInfo?.reduce(
-      (acc, athlete) =>
+    athletes?.reduce(
+      (acc: number, athlete: Athlete) =>
         acc +
         athlete.routine.reduce(
           (dayAcc: number, routineDay: RoutineDay) =>
@@ -39,9 +47,9 @@ const FeedbackBtn = () => {
     ) || 0;
 
   // Get the feedback list with athlete name, exercise name and feedback of the exercise
-  const feedbackList =
-    athletesInfo
-      ?.flatMap((athlete) =>
+  const feedbackList: FeedbackItem[] =
+    athletes
+      ?.flatMap((athlete: Athlete) =>
         athlete.routine.flatMap((routineDay: RoutineDay) =>
           routineDay.map((exercise: Exercise) => ({
             athleteId: athlete.id,
@@ -51,7 +59,7 @@ const FeedbackBtn = () => {
           }))
         )
       )
-      .filter((feedback) => feedback.feedback !== null) || [];
+      .filter((feedback: FeedbackItem) => feedback.feedback !== null) || [];
 
   console.log(feedbackList);
 
@@ -76,7 +84,7 @@ const FeedbackBtn = () => {
         </DialogHeader>
         <div className="space-y-2 max-h-60 overflow-y-auto">
           {feedbackList ? (
-            feedbackList.map((feedback, index) => (
+            feedbackList.map((feedback: FeedbackItem, index: number) => (
               <div
                 key={index}
                 className="border p-2 rounded-md border-gray-200 pb-2 flex flex-col gap-3"

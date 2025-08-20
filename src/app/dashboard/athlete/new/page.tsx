@@ -16,7 +16,7 @@ import { NewRoutine } from "@/types/routineType";
 import { useForm } from "react-hook-form";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
 import { NewAthlete } from "@/types/athleteType";
-import createNewAthlete from "@/app/api/coach";
+import { createNewAthlete } from "@/app/api/coach";
 import { useRouter } from "next/navigation";
 
 const NewAthletePage = () => {

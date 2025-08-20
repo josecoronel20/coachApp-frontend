@@ -1,13 +1,22 @@
-import { useCoachStore } from "@/store/coachStore";
+"use client";
 import { Athlete } from "@/types/athleteType";
 import React, { useEffect, useState } from "react";
 import { AthleteCard } from "./AthleteCard";
+import { getAllAthletes } from "@/app/api/coach";
 
 const AthleteList = ({ searchQuery }: { searchQuery: string }) => {
-  const { athletesInfo } = useCoachStore();
-  const [currentAthletes, setCurrentAthletes] = useState<Athlete[]>(
-    athletesInfo || []
-  );
+  const [athletesInfo, setAthletesInfo] = useState<Athlete[]>([]);
+
+  useEffect(() => {
+    const fetchAthletes = async () => {
+      const response = await getAllAthletes();
+      const athletesInfo = await response.json();
+      setAthletesInfo(athletesInfo);
+    };
+    fetchAthletes();
+  }, []);
+
+  const [currentAthletes, setCurrentAthletes] = useState<Athlete[]>([]);
 
   // Filter athletes based on search query
   useEffect(() => {
