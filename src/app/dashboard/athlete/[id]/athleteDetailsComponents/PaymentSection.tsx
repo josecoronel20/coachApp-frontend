@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { updatePaymentDate } from "@/app/api/protected";
 import { KeyedMutator } from "swr";
 import { Athlete } from "@/types/athleteType";
+import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
 
 interface PaymentSectionProps {
   paymentDate: string;
@@ -20,6 +21,7 @@ const PaymentSection = ({
   mutate,
 }: PaymentSectionProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
+  const {mutate: mutateAthletes} = useGetAllAthletes();
 
   // Check if payment date is not set
   const hasNotPaid = !paymentDate || paymentDate === "";
@@ -88,6 +90,7 @@ const PaymentSection = ({
 
     if (response.ok) {
       mutate();
+      mutateAthletes();
     }
 
     setIsUpdating(false);

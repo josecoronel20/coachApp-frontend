@@ -14,6 +14,8 @@ import EditRoutineSection from "@/components/reusable/EditRoutineSection";
 import PaymentSection from "./athleteDetailsComponents/PaymentSection";
 import AthleteInfo from "./athleteDetailsComponents/AthleteInfo";
 import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
+import { DeleteAthleteSection } from "./athleteDetailsComponents/DeleteAthleteSection";
+import SkeletonAthleteDetail from "./athleteDetailsComponents/SkeletonAthleteDetail";
 
 const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
@@ -23,18 +25,7 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
 
   // If athlete is not found, show error message
   if (isLoading || !athlete) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-600">
-            Atleta no encontrado
-          </h2>
-          <p className="text-gray-500 mt-2">
-            El atleta que buscas no existe o ha sido eliminado.
-          </p>
-        </div>
-      </div>
-    );
+    return <SkeletonAthleteDetail />;
   }
 
   const handleWhatsAppRoutine = () => {
@@ -91,10 +82,7 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
                                  {/* Athlete Info */}
                  <AthleteInfo 
                    athlete={athlete} 
-                   onSave={(updatedData) => {
-                     // TODO: Implement actual athlete update logic
-                     console.log('Athlete updated:', updatedData);
-                   }}
+                   mutate={mutate}
                  />
 
                 {/* Payment Info */}
@@ -103,6 +91,9 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
                   athleteId={athlete.id}
                   mutate={mutate}
                 />
+
+                {/* Delete Athlete */}
+                <DeleteAthleteSection athleteId={athlete.id} />
               </CardContent>
             </Card>
           </div>

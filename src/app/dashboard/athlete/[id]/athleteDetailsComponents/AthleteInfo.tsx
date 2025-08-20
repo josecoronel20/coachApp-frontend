@@ -5,13 +5,22 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { updateAthleteBasicInfo } from "@/app/api/protected";
+
+
+interface ErrorResponse {
+  status?: number;
+  message?: string;
+}
 
 const AthleteInfo = ({
   athlete,
   onSave,
+  mutate,
 }: {
   athlete: Athlete;
   onSave?: (updatedAthlete: Partial<Athlete>) => void;
+  mutate: () => void;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,7 +30,7 @@ const AthleteInfo = ({
     bodyWeight: athlete.bodyWeight || 0,
     notes: athlete.notes || "",
   });
-
+  const [responseDataError, setResponseDataError] = useState<ErrorResponse | null>(null);
   //number of notes to review
   const numberOfNotesToReview = athlete.routine.reduce(
     (acc, day) =>
@@ -40,9 +49,16 @@ const AthleteInfo = ({
     }));
   };
 
-  const handleSave = () => {
-    onSave?.(formData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    const response = await updateAthleteBasicInfo(athlete.id, formData.name, formData.email, formData.phone, formData.notes);
+
+    const responseData = await response.json();
+    if (response.status === 200) {
+      setIsEditing(false);
+      mutate()
+    }else if (response.status === 400 || response.status === 404) {
+      setResponseDataError(responseData);
+    }
   };
 
   const handleCancel = () => {
@@ -171,6 +187,10 @@ const AthleteInfo = ({
               rows={3}
             />
           </div>
+
+          {responseDataError && (
+            <p className="text-red-500">{responseDataError.message}</p>
+          )}
 
           <div className="flex space-x-2 pt-2">
             <Button

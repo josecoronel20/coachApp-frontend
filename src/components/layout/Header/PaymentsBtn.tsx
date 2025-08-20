@@ -80,7 +80,7 @@ const PaymentsBtn = () => {
                   )} días`}
                 </p>
 
-                <Link href={`/dashboard/athlete/${athlete.id}`}>
+                <Link href={`/dashboard/athlete/${athlete.id}`} onClick={() => setPaymentsOpen(false)}>
                   <Button
                     variant="outline"
                     size="sm"

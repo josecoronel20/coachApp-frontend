@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Save, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
-import { NewRoutine } from "@/types/routineType";
+import { NewRoutine, Routine } from "@/types/routineType";
 import { useForm } from "react-hook-form";
 import EditRoutineSection from "@/components/reusable/EditRoutineSection";
 import { NewAthlete } from "@/types/athleteType";
@@ -87,7 +87,7 @@ const NewAthletePage = () => {
 
   const handleCreateAthlete = async (data: NewAthlete) => {
     try {
-      const response = await createNewAthlete(data);
+      const response = await createNewAthlete({...data,routine:mockParsedRoutine as Routine});
       const responseData = await response.json();
       
       const isSuccess = response.status === 201;

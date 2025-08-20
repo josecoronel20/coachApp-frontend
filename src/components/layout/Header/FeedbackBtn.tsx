@@ -99,7 +99,7 @@ const FeedbackBtn = () => {
                   <p className="text-sm text-red-500">{feedback.feedback}</p>
                 </div>
 
-                <Link href={`/dashboard/athlete/${feedback.athleteId}`}>
+                <Link href={`/dashboard/athlete/${feedback.athleteId}`} onClick={() => setFeedbackOpen(false)}>
                   <Button variant="outline" size="sm" className="w-full cursor-pointer">
                     Ir al perfil
                   </Button>
