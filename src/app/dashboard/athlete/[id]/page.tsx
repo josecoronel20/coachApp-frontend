@@ -10,7 +10,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-import EditRoutineSection from "@/components/reusable/EditRoutineSection";
+import EditRoutineSection from "@/components/reusable/editRoutineSection/EditRoutineSection";
 import PaymentSection from "./athleteDetailsComponents/PaymentSection";
 import AthleteInfo from "./athleteDetailsComponents/AthleteInfo";
 import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";

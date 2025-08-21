@@ -14,7 +14,7 @@ import { ArrowLeft, Plus, Save, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import { NewRoutine, Routine } from "@/types/routineType";
 import { useForm } from "react-hook-form";
-import EditRoutineSection from "@/components/reusable/EditRoutineSection";
+import EditRoutineSection from "@/components/reusable/editRoutineSection/EditRoutineSection";
 import { NewAthlete } from "@/types/athleteType";
 import { createNewAthlete } from "@/app/api/coach";
 import { useRouter } from "next/navigation";
