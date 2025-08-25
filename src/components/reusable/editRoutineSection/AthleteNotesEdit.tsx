@@ -1,13 +1,20 @@
 import React from "react";
 import { Button } from "../../ui/button";
+import { X } from "lucide-react";
 
 const AthleteNotesEdit = ({ notes }: { notes: string }) => {
   return (
     <div>
       <p className="text-sm font-medium">Nota del atleta</p>
-      <div className="flex flex-col gap-2 border border-red-500 rounded-md p-1">
-        <p className="text-sm text-red-500">{notes}</p>
-        <Button>Corregido</Button>
+      <div className="flex justify-between items-center gap-2 rounded-md p-2 border border-e-gray-800">
+        <p className="text-sm">{notes}</p>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="h-8 hover:bg-red-400"
+        >
+          <X className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

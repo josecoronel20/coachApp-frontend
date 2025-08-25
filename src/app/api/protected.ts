@@ -1,3 +1,5 @@
+import { Routine } from "@/types/routineType";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const updatePaymentDate = async (id: string, paymentDate: string) => {
@@ -36,6 +38,19 @@ export const updateAthleteBasicInfo = async (id: string, name: string, email: st
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
     body: JSON.stringify({ id, name, email, phone, notes }),
+  });
+  return response;
+};
+
+export const updateRoutine = async (idAthlete: string, routine: Routine) => {
+  const response = await fetch(`${API_URL}/api/protected/updateRoutine`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },  
+    body: JSON.stringify({ idAthlete, routine }),
   });
   return response;
 };

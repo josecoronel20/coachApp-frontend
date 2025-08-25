@@ -99,7 +99,7 @@ const PaymentSection = ({
   return (
     <div className="p-4 border rounded-lg bg-background">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-medium text-foreground flex items-center space-x-2">
+        <h3 className="font-medium text-muted-foreground flex items-center space-x-2">
           <Calendar className="h-4 w-4" />
           <span>Estado de Pago</span>
         </h3>

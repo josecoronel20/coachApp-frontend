@@ -1,6 +1,6 @@
 "use client";
 import { Athlete } from "@/types/athleteType";
-import { FileText, Edit, Save, X } from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ const AthleteInfo = ({
     (acc, day) =>
       acc +
       day.reduce(
-        (acc, exercise) => acc + (exercise.athleteNotes !== null ? 1 : 0),
+        (acc, exercise) => acc + (exercise.athleteNotes !== null && exercise.athleteNotes !== "" ? 1 : 0),
         0
       ),
     0
@@ -72,6 +72,7 @@ const AthleteInfo = ({
     setIsEditing(false);
   };
 
+
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
@@ -95,6 +96,7 @@ const AthleteInfo = ({
             <p>
               <strong>Nombre:</strong> {athlete.name}
             </p>
+
             <p>
               <strong>Email:</strong> {athlete.email || "No disponible"}
             </p>
@@ -103,15 +105,20 @@ const AthleteInfo = ({
             </p>
             <p>
               <strong>Peso corporal actual:</strong>{" "}
-              {athlete.bodyWeight || "No registrado"} kg
+              {`${athlete.bodyWeight} kg` || "No registrado"}
+            </p>
+
+            <p>
+              <strong>Observaciones:</strong>{" "}
+              {athlete.notes || "No registrado"}
             </p>
 
             <p
               className={`${
-                numberOfNotesToReview > 0 ? "text-red-700" : "text-green-700"
+                numberOfNotesToReview > 0 ? "text-red-400" : "text-green-400"
               } `}
             >
-              <strong className="text-foreground">Notas del atleta:</strong>
+              <strong className="text-muted-foreground">Notas del atleta:</strong>
               {numberOfNotesToReview > 0
                 ? ` hay ${numberOfNotesToReview} notas por revisar`
                 : " no hay notas por revisar"}
@@ -122,7 +129,7 @@ const AthleteInfo = ({
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-muted-foreground">
                 Nombre
               </label>
               <Input
@@ -133,7 +140,7 @@ const AthleteInfo = ({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Email</label>
+              <label className="text-sm font-medium text-muted-foreground">Email</label>
               <Input
                 type="email"
                 value={formData.email}
@@ -143,7 +150,7 @@ const AthleteInfo = ({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-muted-foreground">
                 Teléfono
               </label>
               <Input
@@ -154,7 +161,7 @@ const AthleteInfo = ({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-muted-foreground">
                 Peso corporal (kg)
               </label>
               <Input
@@ -170,14 +177,14 @@ const AthleteInfo = ({
                 disabled
                 className="bg-gray-100 cursor-not-allowed"
               />
-              <p className="text-xs text-gray-500 italic">
+              <p className="text-xs text-muted-foreground italic">
                 Solo puede ser actualizado por el atleta
               </p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-muted-foreground">
               Observaciones
             </label>
             <Textarea
@@ -212,18 +219,7 @@ const AthleteInfo = ({
         </div>
       )}
 
-      {/* Notes */}
-      {athlete.notes && !isEditing && (
-        <div className="space-y-2">
-          <h3 className="font-medium text-foreground flex items-center space-x-2">
-            <FileText className="h-4 w-4" />
-            <span>Observaciones del atleta</span>
-          </h3>
-          <p className="text-sm text-muted-foreground bg-background p-3 rounded-md ">
-            {athlete.notes}
-          </p>
-        </div>
-      )}
+      
     </section>
   );
 };

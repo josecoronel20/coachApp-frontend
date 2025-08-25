@@ -38,7 +38,7 @@ const FeedbackBtn = () => {
             dayAcc +
             routineDay.reduce(
               (exerciseAcc: number, exercise: Exercise) =>
-                exerciseAcc + (exercise.athleteNotes !== null ? 1 : 0),
+                exerciseAcc + (exercise.athleteNotes !== null && exercise.athleteNotes !== "" ? 1 : 0),
               0
             ),
           0
@@ -59,7 +59,7 @@ const FeedbackBtn = () => {
           }))
         )
       )
-      .filter((feedback: FeedbackItem) => feedback.feedback !== null) || [];
+      .filter((feedback: FeedbackItem) => feedback.feedback !== null && feedback.feedback !== "") || [];
 
   console.log(feedbackList);
 

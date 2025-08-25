@@ -1,68 +1,132 @@
 import React, { useState } from "react";
-import { Exercise } from "@/types/routineType";
+import {
+  Exercise,
+  NewExercise,
+  NewRoutine,
+  Routine,
+} from "@/types/routineType";
 import DialogExerciseCard from "./DialogExerciseCard";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Edit } from "lucide-react";
+import { DeleteButton } from "../DeleteButton";
 
 interface ExerciseCardProps {
-  exercise: Exercise;
-  index: number;
-  selectedDay: number;
+  exercise: Exercise | NewExercise;
+  indexExercise: number;
+  indexDay: number;
   isNewRoutine: boolean;
+  idAthlete: string;
+  routine: Routine | NewRoutine;
+  handleDeleteExercise: () => void;
 }
 
 const ExerciseCard = ({
   exercise,
-  index,
-  selectedDay,
+  indexExercise,
+  indexDay,
   isNewRoutine,
+  idAthlete,
+  routine,
+  handleDeleteExercise,
 }: ExerciseCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
+  const lastSession =
+    "exerciseHistory" in exercise && exercise.exerciseHistory.length > 0
+      ? exercise.exerciseHistory[exercise.exerciseHistory.length - 1]
+      : null;
+
   return (
-    <div key={index} className="p-3 border rounded-lg bg-muted/50">
+    <div
+      key={`${indexDay}-${indexExercise}`}
+      className="p-3 border rounded-lg bg-muted/50"
+    >
       <div className="flex items-center justify-between">
-        <div>
-          <h4 className="font-medium">{exercise.exercise}</h4>
-          <div>
-            <p className="text-sm text-muted-foreground">
-              {exercise.sets.length} series | Rango: {exercise.range[0]}-
-              {exercise.range[1]} reps
-            </p>
-            {!isNewRoutine && "weight" in exercise && exercise.weight && (
-              <p className="text-sm text-muted-foreground">
-                Peso actual: {exercise.weight}kg
+        <div className="w-full flex flex-col text-sm">
+          <div className="flex items-center justify-between w-full text-base">
+            {/* exercise name */}
+            <h4 className="font-medium">{exercise.exercise}</h4>
+
+            <div className="flex items-center gap-2">
+              {/* delete button */}
+              <DeleteButton label="ejercicio" handleDelete={handleDeleteExercise} />
+
+              {/* edit button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <p className="text-muted-foreground">
+            <span className="font-medium">series:</span> {exercise.sets}
+          </p>
+
+          <p className="text-muted-foreground">
+            <span className="font-medium">rango:</span> entre{" "}
+            {exercise.rangeMin} y {exercise.rangeMax}
+          </p>
+
+          {/* Weights only if it is no a new routine */}
+          { lastSession && lastSession.weight && (
+              <p className=" text-muted-foreground">
+                <span className="font-medium">peso actual:</span> {lastSession.weight + " kg"}
               </p>
             )}
-            {!isNewRoutine &&
-              "exerciseHistory" in exercise &&
-              exercise.exerciseHistory &&
-              exercise.exerciseHistory.length > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  reps actuales: {exercise.exerciseHistory[0].sets.join(" - ")}
-                </p>
-              )}
-          </div>
+
+          {/* reps only if history exists */}
+          { lastSession && lastSession.sets && (
+              <p className=" text-muted-foreground">
+                <span className="font-medium">reps actuales:</span> {lastSession.sets.join(" - ")}
+              </p>
+            )}
+
+          {/* Coach notes */}
           {exercise.coachNotes && (
-            <p className="text-xs text-blue-600">
-              Nota del profe: {exercise.coachNotes}
+            <p className="text-blue-400">
+              <span className="font-medium">Nota del profe:</span>{" "}
+              {exercise.coachNotes}
             </p>
           )}
-          {!isNewRoutine &&
-            "athleteNotes" in exercise &&
-            exercise.athleteNotes && (
-              <p className="text-xs text-red-600">
-                Nota del atleta: {exercise.athleteNotes}
+
+          {/* Athlete notes only if it exists */}
+          { "athleteNotes" in exercise && exercise.athleteNotes && (
+              <p className="text-red-400">
+                <span className="font-medium">Nota del atleta:</span>{" "}
+                {exercise.athleteNotes}
               </p>
             )}
         </div>
 
         {/* dialog */}
         {isEditing && (
-          <DialogExerciseCard
-            exercise={exercise}
-            index={index}
-            selectedDay={selectedDay}
-            isNewRoutine={isNewRoutine}
-          />
+          <Dialog open={isEditing} onOpenChange={setIsEditing}>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+
+            <DialogExerciseCard
+              idAthlete={idAthlete}
+              exercise={exercise}
+              indexExercise={indexExercise}
+              indexDay={indexDay}
+              isNewRoutine={isNewRoutine}
+              setIsEditing={setIsEditing}
+              routine={routine}
+              closeDialog={() => setIsEditing(false)}
+            />
+          </Dialog>
         )}
       </div>
     </div>

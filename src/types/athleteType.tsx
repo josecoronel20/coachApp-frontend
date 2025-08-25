@@ -5,9 +5,9 @@ export type Athlete = {
     coachId: string;
     paymentDate: string;
     notes: string;
-    bodyWeight?: number;
+    bodyWeight: number;
     name: string;
-    email?: string;
+    email: string;
     phone: string;
     routine: Routine;
 }
@@ -16,9 +16,9 @@ export type NewAthlete = {
     coachId: string;
     paymentDate: string;
     notes: string;
-    bodyWeight?: number;
+    bodyWeight: number;
     name: string;
-    email?: string;
+    email: string;
     phone: string;
     routine: Routine;
 }

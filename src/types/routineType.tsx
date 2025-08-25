@@ -7,11 +7,11 @@ export type ExerciseHistory = {
 
 export type Exercise = {
     exercise: string;
-    sets: number[];
-    range:[number,number];
-    weight: number;
-    coachNotes: string | null;
-    athleteNotes: string | null;
+    sets: number;
+    rangeMin: number;
+    rangeMax: number;
+    coachNotes: string;
+    athleteNotes: string;
     exerciseHistory: ExerciseHistory[];
 }
 
@@ -22,9 +22,10 @@ export type Routine = RoutineDay[];
 //routine without athlete values
 export type NewExercise = {
     exercise: string;
-    sets: number[];
-    range:[number,number];
-    coachNotes: string | null;
+    sets: number;
+    rangeMin: number;
+    rangeMax: number;
+    coachNotes: string;
 }
 
 export type NewRoutineDay = NewExercise[];

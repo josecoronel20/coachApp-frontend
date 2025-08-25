@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   MessageCircle,
-  User,
   Calendar,
   ArrowLeft,
 } from "lucide-react";
@@ -14,15 +13,18 @@ import EditRoutineSection from "@/components/reusable/editRoutineSection/EditRou
 import PaymentSection from "./athleteDetailsComponents/PaymentSection";
 import AthleteInfo from "./athleteDetailsComponents/AthleteInfo";
 import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
-import { DeleteAthleteSection } from "./athleteDetailsComponents/DeleteAthleteSection";
 import SkeletonAthleteDetail from "./athleteDetailsComponents/SkeletonAthleteDetail";
+import { deleteAthlete } from "@/app/api/protected";
+import { useRouter } from "next/navigation";
+import { DeleteButton } from "@/components/reusable/DeleteButton";
+import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
 
 const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
   const { data, isLoading, mutate } = useGetAthleteInfo(id);
   const athlete = data as Athlete;
-
-
+  const router = useRouter();
+  const { mutate: mutateAllAthletes } = useGetAllAthletes();
   // If athlete is not found, show error message
   if (isLoading || !athlete) {
     return <SkeletonAthleteDetail />;
@@ -35,6 +37,14 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
       athlete.phone
     }?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
+  };
+
+  const handleDeleteAthlete = async () => {
+    const response = await deleteAthlete(athlete.id);
+    if (response.status === 200) {
+      mutateAllAthletes();
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -55,9 +65,8 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
               </h1>
             </div>
             <Button
-              variant="outline"
               onClick={handleWhatsAppRoutine}
-              className="w-full bg-green-400 hover:bg-green-500 hover:text-white text-white"
+              className="w-full bg-green-800 hover:bg-green-700 hover:text-white text-white"
             >
               <MessageCircle className="h-4 w-4 mr-2" />
               Enviar rutina por WhatsApp
@@ -72,12 +81,6 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
           {/* Athlete Quick Info Card */}
           <div className="lg:col-span-1">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <User className="h-5 w-5" />
-                  <span>Información del atleta</span>
-                </CardTitle>
-              </CardHeader>
               <CardContent className="space-y-4">
                                  {/* Athlete Info */}
                  <AthleteInfo 
@@ -93,7 +96,7 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
                 />
 
                 {/* Delete Athlete */}
-                <DeleteAthleteSection athleteId={athlete.id} />
+                <DeleteButton label="atleta" handleDelete={handleDeleteAthlete} />
               </CardContent>
             </Card>
           </div>
@@ -111,6 +114,7 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
                 <EditRoutineSection
                   routine={athlete.routine}
                   isNewRoutine={false}
+                  athleteId={athlete.id}
                 />
               </CardContent>
             </Card>
