@@ -9,44 +9,25 @@ import React, { useState } from "react";
 import { TrainingExercise } from "../types";
 
 interface CommentsBtnProps {
-  exercise: TrainingExercise | undefined;
-  onUpdateAthleteNotes: (notes: string) => void;
+  coachNotes: string;
+  athleteNotes: string;
+  setAthleteNotes: (text: string) => void;
 }
 
-const CommentsBtn = ({ exercise, onUpdateAthleteNotes }: CommentsBtnProps) => {
-  const [athleteNotes, setAthleteNotes] = useState(exercise?.athleteNotes || "");
+const CommentsBtn = ({ coachNotes, athleteNotes, setAthleteNotes }: CommentsBtnProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleSaveNotes = () => {
-    onUpdateAthleteNotes(athleteNotes);
-    setIsOpen(false);
-  };
-
-  const handleCancel = () => {
-    setAthleteNotes(exercise?.athleteNotes || "");
-    setIsOpen(false);
-  };
-
-  // Don't render if exercise is undefined
-  if (!exercise) {
-    return (
-      <Button variant="ghost" size="sm" disabled>
-        <MessageCircle className="h-4 w-4" /> Comentarios
-      </Button>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" className={exercise?.athleteNotes ? "text-blue-600" : ""}>
+            <Button variant="ghost" size="sm" className={athleteNotes ? "text-blue-600" : ""}>
                 <MessageCircle className="h-4 w-4" /> 
-                {exercise?.athleteNotes ? "Ver Comentarios" : "Comentarios"}
+                {athleteNotes ? "Ver Comentarios" : "Comentarios"}
             </Button>
         </DialogTrigger>
         <DialogContent className="max-w-md">
             <DialogHeader>
-                <DialogTitle>Comentarios sobre {exercise?.exercise || "este ejercicio"}</DialogTitle>
+                <DialogTitle>Comentarios sobre este ejercicio</DialogTitle>
                 <DialogDescription>
                     Revisa los comentarios del entrenador y deja tu feedback sobre este ejercicio
                 </DialogDescription>
@@ -60,9 +41,9 @@ const CommentsBtn = ({ exercise, onUpdateAthleteNotes }: CommentsBtnProps) => {
                     </div>
                     <Card>
                         <CardContent className="">
-                            {exercise?.coachNotes ? (
+                            {coachNotes ? (
                                 <p className="text-sm text-muted-foreground">
-                                    {exercise.coachNotes}
+                                    {coachNotes}
                                 </p>
                             ) : (
                                 <p className="text-sm text-muted-foreground italic">
@@ -98,26 +79,7 @@ const CommentsBtn = ({ exercise, onUpdateAthleteNotes }: CommentsBtnProps) => {
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-2 pt-2">
-                    <Button
-                        onClick={handleSaveNotes}
-                        size="sm"
-                        className="flex-1"
-                        disabled={athleteNotes === (exercise?.athleteNotes || "")}
-                    >
-                        <Send className="h-4 w-4 mr-1" />
-                        Guardar
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={handleCancel}
-                        size="sm"
-                    >
-                        Cancelar
-                    </Button>
                 </div>
-            </div>
         </DialogContent>
     </Dialog>
   );

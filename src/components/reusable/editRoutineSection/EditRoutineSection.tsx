@@ -30,7 +30,7 @@ const EditRoutineSection = ({
     sets: 3,
     rangeMin: 8,
     rangeMax: 12,
-    coachNotes: null,
+    coachNotes: "",
   };
 
   const handleDeleteExercise = async (indexExercise: number,athleteId: string) => {

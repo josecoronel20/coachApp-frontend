@@ -1,29 +1,33 @@
 import React from "react";
 import SetCard from "./SetCard";
-import { TrainingSet } from "../types";
+import { ExerciseHistory } from "@/types/routineType";
 
 const SetsAndReps = ({ 
-  sets, 
-  exerciseIndex, 
-  onSetUpdate 
+  minReps,
+  maxReps,
+  infoCurrentExercise,
+  indexExercise,
 }: { 
-  sets: TrainingSet[]; 
-  exerciseIndex: number;
-  onSetUpdate: (exerciseIndex: number, setIndex: number, isDone: boolean, reps: number) => void;
+  minReps: number;
+  maxReps: number;
+  infoCurrentExercise: ExerciseHistory;
+  indexExercise: number;
 }) => {
+
   return (
     <div className="space-y-2 w-full">
       <div className="grid grid-cols-3 items-center justify-between w-full">
         <h3 className="font-medium text-sm">Series</h3>
         <p className="font-medium text-sm text-center">Repeticiones</p>
       </div>
-      {sets.map((set, index) => (
+      {infoCurrentExercise?.sets.map((reps, index) => (
         <SetCard 
-          key={`${exerciseIndex}-${index}`} 
-          set={set} 
-          index={index} 
-          exerciseIndex={exerciseIndex}
-          onSetUpdate={onSetUpdate}
+          key={`${index}`} 
+          reps={reps} 
+          indexRep={index} 
+          indexExercise={indexExercise}
+          minReps={minReps}
+          maxReps={maxReps}
         />
       ))}
     </div>
