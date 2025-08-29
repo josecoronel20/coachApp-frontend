@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Calendar, Dumbbell } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useAthleteStore } from "@/store/useAthleteStore";
+import BodyWeight from "./athleteViewComponents/BodyWeight";
 
 /**
  * Página principal del atleta que muestra:
@@ -19,9 +20,9 @@ const AthletePage = () => {
 
   // Estado local para manejar la hidratación
   const [isClient, setIsClient] = useState(false);
-  
+
   // Estado para el día seleccionado
-  const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
 
   // Obtener datos del atleta desde el store
   const { athlete } = useAthleteStore();
@@ -65,42 +66,32 @@ const AthletePage = () => {
     }
   };
 
-  const selectedDayExercises = selectedDayIndex !== null 
-    ? athlete.routine[selectedDayIndex] 
-    : null;
+  const selectedDayExercises =
+    selectedDayIndex !== null ? athlete.routine[selectedDayIndex] : null;
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-2xl mx-auto space-y-6 flex flex-col">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {athlete.name}
-          </h1>
-          <p className="text-gray-600">
-            Selecciona un día para ver los ejercicios y comenzar tu entrenamiento
-          </p>
-        </div>
+        <header className="text-center  border-b p-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-primary">{athlete.name}</h1>
+            <BodyWeight />
+          </div>
+        </header>
 
         {/* Días de la rutina */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Días de Entrenamiento
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="px-2 flex flex-col gap-4 items-center">
+          <h2 className="text-xl">Rutina de entrenamiento</h2>
+          <div className="flex flex-wrap gap-2 justify-center">
             {athlete.routine.map((dayExercises, dayIndex) => (
               <Button
                 key={dayIndex}
-                variant={selectedDayIndex === dayIndex ? "default" : "outline"}
-                className="h-20 flex flex-col items-center justify-center gap-1"
+                variant={selectedDayIndex === dayIndex ? "default" : "ghost"}
+                className="w-fit"
                 onClick={() => handleDaySelect(dayIndex)}
               >
-                <span className="text-lg font-semibold">Día {dayIndex + 1}</span>
-                <span className="text-sm opacity-80">
-                  {dayExercises.length} ejercicio{dayExercises.length !== 1 ? 's' : ''}
-                </span>
+                Día {dayIndex + 1}
               </Button>
             ))}
           </div>
@@ -108,10 +99,9 @@ const AthletePage = () => {
 
         {/* Lista simple de ejercicios del día seleccionado */}
         {selectedDayIndex !== null && selectedDayExercises && (
-          <div className="space-y-4">
+          <div className="space-y-4 p-4 m-4 border rounded-lg">
             <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Dumbbell className="h-5 w-5" />
-              Ejercicios del Día {selectedDayIndex + 1}
+              Día {selectedDayIndex + 1}
             </h2>
 
             {/* Lista de ejercicios */}
@@ -119,30 +109,29 @@ const AthletePage = () => {
               {selectedDayExercises.map((exercise, exerciseIndex) => (
                 <div
                   key={exerciseIndex}
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border shadow-sm"
+                  className={`flex items-center justify-between p-3 ${exerciseIndex !== selectedDayExercises.length - 1 ? "border-b" : ""}`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-500">
-                      {exerciseIndex + 1}.
-                    </span>
-                    <span className="font-semibold text-gray-900">
+                    
+                    <span className="text-foreground">
                       {exercise.exercise}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-600">
-                    <span className="font-medium">{exercise.sets} series</span>
-                    <span className="mx-2">•</span>
-                    <span>{exercise.rangeMin}-{exercise.rangeMax} reps</span>
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium">{exercise.sets} x </span>
+                    <span>
+                      {exercise.rangeMin}-{exercise.rangeMax}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Botón para comenzar entrenamiento */}
-            <div className="pt-4">
+            <div className="fixed bottom-0 left-0 right-0 p-4">
               <Button
                 onClick={handleStartTraining}
-                className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg"
+                className="w-full bg-primary hover:bg-primary/90 h-12 text-lg"
               >
                 Empezar Entrenamiento
                 <ChevronRight className="h-5 w-5 ml-2" />
@@ -155,7 +144,8 @@ const AthletePage = () => {
         {selectedDayIndex === null && (
           <div className="text-center py-8">
             <p className="text-gray-500">
-              Selecciona un día para ver los ejercicios y comenzar tu entrenamiento
+              Selecciona un día para ver los ejercicios y comenzar tu
+              entrenamiento
             </p>
           </div>
         )}

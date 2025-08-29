@@ -37,3 +37,15 @@ export const saveSession = async (id: string, dayIndex: number, sessionProgress:
     });
     return response
 }
+
+export const updateBodyWeight = async (id: string, bodyWeight: number) => {
+    const response = await fetch(`${API_URL}/api/athletes/updateBodyWeight`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, bodyWeight }),
+    });
+    return response;
+}

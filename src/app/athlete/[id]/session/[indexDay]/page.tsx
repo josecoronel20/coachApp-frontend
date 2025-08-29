@@ -19,6 +19,7 @@ import { getAthleteById, saveSession } from "@/app/api/athlete";
 const SessionPage = () => {
   const params = useParams();
   const athleteId = params.id as string;
+
   const indexDay = parseInt(params.indexDay as string) - 1; // Convertir a 0-based index
 
   // Estado local para manejar la hidratación
