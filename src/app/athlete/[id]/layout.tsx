@@ -1,41 +1,38 @@
 "use client";
 
-import { getAthleteInfo } from "@/app/api/coach";
-import { useAthleteStore } from "@/store/useAthleteStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { getAthleteById } from "@/app/api/athlete";
+import { useAthleteStore } from "@/store/useAthleteStore";
+import { Athlete } from "@/types/athleteType";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const { id } = useParams();
-  const { athlete, setAthlete } = useAthleteStore();
+/**
+ * Layout que maneja la carga del atleta
+ * - Verifica si existe en localStorage
+ * - Si no existe, lo obtiene del backend
+ * - Guarda en localStorage y store
+ */
+const AthleteLayout = ({ children }: { children: React.ReactNode }) => {
+  const params = useParams();
+  const { setAthlete } = useAthleteStore();
 
   useEffect(() => {
-    // 1. Revisar si ya hay datos en el store
-    if (!athlete) {
-      // 2. Revisar LocalStorage
-      const stored = localStorage.getItem("athleteData");
-      if (stored) {
-        console.log("stored", stored);
-        setAthlete(JSON.parse(stored));
-      } else {
-        // 3. Hacer fetch al backend
-        getAthleteInfo(id as string).then(async (res) => {
-          if (res.ok) {
-            const data = await res.json();
-            setAthlete(data);
-          }
-        });
-      }
-    }
-  }, [id]);
+    const fetchAthlete = async () => {
+      const response = await getAthleteById(params.id as string);
+      const data = await response.json();
+      setAthlete(data);
+      localStorage.setItem("athlete", JSON.stringify(data));
+    };
 
-  return (
-    <html lang="es" className="dark">
-      <body>{children}</body>
-    </html>
-  );
-}
+    if (localStorage.getItem("athlete")) {
+      setAthlete(JSON.parse(localStorage.getItem("athlete") || ""));
+    } else {
+      fetchAthlete();
+    }
+  }, [params.id]);
+
+  // Renderizar children cuando el atleta esté cargado
+  return <>{children}</>;
+};
+
+export default AthleteLayout;
