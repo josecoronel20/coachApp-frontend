@@ -5,6 +5,11 @@ import SetCard from "./SetCard";
 import { SessionExercise } from "@/store/useAthleteSessionStore";
 import ExerciseWeight from "./ExerciseWeight";
 import AthleteNotes from "./AthleteNotes";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { updateRepsTracked } from "@/app/api/athlete";
+import { useAthleteStore } from "@/store/useAthleteStore";
+import { useParams } from "next/navigation";
 
 interface ExerciseDefinition {
   name: string;
@@ -40,10 +45,19 @@ const ExerciseView = ({
   onSetWeight,
   onSetAthleteNotes,
 }: ExerciseViewProps) => {
-  const [repsTracked] = useState<boolean>(false);
-
+  const { athlete } = useAthleteStore();
+  const [repsTracked, setRepsTracked] = useState<boolean>(athlete?.repsTracked || false);
+  const idFromParams = useParams().id as string;
+  
   const handleSetReps = (setIndex: number, newReps: number) => {
     onSetReps(setIndex, newReps);
+  };
+
+  const handleSetRepsTracked = async () => {
+    const response = await updateRepsTracked(idFromParams, !repsTracked);
+    if (response.status === 200) {
+      setRepsTracked(!repsTracked);
+    }
   };
 
   const recommendations = [
@@ -74,8 +88,6 @@ const ExerciseView = ({
         </p>
       </details>
 
-      
-
       <div className="grid grid-cols-2 items-center gap-2">
         {/* Información de última sesión (solo referencia visual) */}
         {exerciseDefinition.lastHistory && (
@@ -90,12 +102,15 @@ const ExerciseView = ({
                   {exerciseDefinition.lastHistory.weight} kg
                 </span>
               </p>
-              <p>
-                Reps:{" "}
-                <span className="font-semibold text-foreground">
-                  {exerciseDefinition.lastHistory.sets.join(" - ")}
-                </span>
-              </p>
+
+              {repsTracked && (
+                <p>
+                  Reps:{" "}
+                  <span className="font-semibold text-foreground">
+                    {exerciseDefinition.lastHistory.sets.join(" - ")}
+                  </span>
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -106,34 +121,62 @@ const ExerciseView = ({
 
       {exerciseDefinition.coachNotes && (
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">Nota del entrenador:</span>{" "}
+          <span className="font-medium text-foreground">
+            Nota del entrenador:
+          </span>{" "}
           {exerciseDefinition.coachNotes}
         </p>
       )}
 
-      {/* Sets y reps */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold">Series y Repeticiones</h3>
-
-        <div className="space-y-2">
-          {sessionExercise.sets.map((reps, setIndex) => (
-            <SetCard
-              key={setIndex}
-              value={reps}
-              onInc={() => handleSetReps(setIndex, reps + 1)}
-              onDec={() => handleSetReps(setIndex, reps - 1)}
-              min={exerciseDefinition.rangeMin || 0}
-              max={exerciseDefinition.rangeMax || 20}
-              label={`Serie ${setIndex + 1}`}
-            />
-          ))}
-        </div>
-
-                 <AthleteNotes 
-           notes={exerciseDefinition.athleteNotes} 
-           onNotesChange={onSetAthleteNotes}
-         />
+      {/* Toggle para modo de registro */}
+      <div className="flex items-center gap-3 p-2 rounded-lg border bg-muted">
+        <Switch
+          id="repsTracked"
+          checked={repsTracked}
+          onCheckedChange={handleSetRepsTracked}
+          className="data-[state=checked]:bg-green-500"
+        />
+        <Label
+          htmlFor="repsTracked"
+          className="cursor-pointer text-sm font-medium"
+        >
+          {repsTracked
+            ? "Modo detallado (anotar todas las series)"
+            : "Modo simple (rango de repeticiones)"}
+        </Label>
       </div>
+
+      {/* Sets y reps */}
+      {repsTracked ? (
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold">Series y Repeticiones</h3>
+          <div className="space-y-2">
+            {sessionExercise.sets.map((reps, setIndex) => (
+              <SetCard
+                key={setIndex}
+                value={reps}
+                onInc={() => handleSetReps(setIndex, reps + 1)}
+                onDec={() => handleSetReps(setIndex, reps - 1)}
+                min={exerciseDefinition.rangeMin || 0}
+                max={exerciseDefinition.rangeMax || 20}
+                label={`Serie ${setIndex + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold">
+            Intentá realizar entre {exerciseDefinition.rangeMin} y{" "}
+            {exerciseDefinition.rangeMax} repeticiones cada serie
+          </h3>
+        </div>
+      )}
+
+      <AthleteNotes
+        notes={exerciseDefinition.athleteNotes}
+        onNotesChange={onSetAthleteNotes}
+      />
     </div>
   );
 };

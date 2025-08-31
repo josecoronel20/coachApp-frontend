@@ -24,11 +24,11 @@ const AthleteLayout = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("athlete", JSON.stringify(data));
     };
 
-    if (localStorage.getItem("athlete")) {
-      setAthlete(JSON.parse(localStorage.getItem("athlete") || ""));
-    } else {
+    // if (localStorage.getItem("athlete")) {
+    //   setAthlete(JSON.parse(localStorage.getItem("athlete") || ""));
+    // } else {
       fetchAthlete();
-    }
+    // }
   }, [params.id]);
 
   // Renderizar children cuando el atleta esté cargado

@@ -49,3 +49,15 @@ export const updateBodyWeight = async (id: string, bodyWeight: number) => {
     });
     return response;
 }
+
+export const updateRepsTracked = async (id: string, repsTracked: boolean) => {
+    const response = await fetch(`${API_URL}/api/athletes/updateRepsTracked`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, repsTracked }),
+    });
+    return response;
+}
