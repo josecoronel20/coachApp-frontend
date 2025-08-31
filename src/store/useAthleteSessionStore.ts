@@ -5,6 +5,7 @@ export interface SessionExercise {
   date: string;
   weight: number;
   sets: number[];
+  athleteNotes?: string;
 }
 
 export interface SessionMeta {
@@ -17,6 +18,8 @@ export interface ExerciseDef {
   setsCount: number;
   weight?: number;
   rangeMin?: number;
+  coachNotes?: string;
+  athleteNotes?: string;
   lastHistory?: {
     weight: number;
     sets: number[];
@@ -39,6 +42,7 @@ interface AthleteSessionState {
   initSession: (dayIndex: number, dayExercises: ExerciseDef[]) => void;
   setReps: (exIndex: number, setIndex: number, reps: number) => void;
   setWeight: (exIndex: number, weight: number) => void;
+  updateAthleteNotes: (exIndex: number, notes: string) => void;
   // Navegar entre ejercicios
   nextExercise: () => void;
   prevExercise: () => void;
@@ -69,6 +73,7 @@ export const useAthleteSessionStore = create<AthleteSessionState>((set, get) => 
         date: currentDate,
         weight: exercise.lastHistory?.weight ?? exercise.weight ?? 0,
         sets,
+        athleteNotes: exercise.athleteNotes || "",
       };
     });
 
@@ -125,6 +130,26 @@ export const useAthleteSessionStore = create<AthleteSessionState>((set, get) => 
       newSessionProgress[exIndex] = {
         ...newSessionProgress[exIndex],
         weight,
+      };
+      
+      return { sessionProgress: newSessionProgress };
+    });
+  },
+
+  // Actualizar notas del atleta
+  updateAthleteNotes: (exIndex: number, notes: string) => {
+    const { sessionProgress } = get();
+    
+    if (exIndex < 0 || exIndex >= sessionProgress.length) {
+      console.warn("Índice de ejercicio fuera de rango:", exIndex);
+      return;
+    }
+
+    set((state) => {
+      const newSessionProgress = [...state.sessionProgress];
+      newSessionProgress[exIndex] = {
+        ...newSessionProgress[exIndex],
+        athleteNotes: notes || "",
       };
       
       return { sessionProgress: newSessionProgress };

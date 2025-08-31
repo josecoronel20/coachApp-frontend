@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
-import ExerciseView from "@/components/ExerciseView";
+import ExerciseView from "@/app/athlete/[id]/session/[indexDay]/sessionComponents/ExerciseView";
 import {
   useAthleteSessionStore,
   ExerciseDef,
@@ -32,6 +32,7 @@ const SessionPage = () => {
     initSession,
     setReps,
     setWeight,
+    updateAthleteNotes,
     nextExercise,
     prevExercise,
     finalizeSession,
@@ -124,6 +125,10 @@ const SessionPage = () => {
     setWeight(currentExerciseIndex, weight);
   };
 
+  const handleSetAthleteNotes = (notes: string) => {
+    updateAthleteNotes(currentExerciseIndex, notes);
+  };
+
   // Handler para finalizar sesión
   const handleFinalizeSession = async () => {
     try {
@@ -184,6 +189,8 @@ const SessionPage = () => {
             setsCount: currentExercise.sets,
             rangeMin: currentExercise.rangeMin,
             rangeMax: currentExercise.rangeMax,
+            coachNotes: currentExercise.coachNotes,
+            athleteNotes: currentSessionExercise.athleteNotes,
             weight: currentSessionExercise.weight, // Usar el peso de la sesión actual
             lastHistory:
               currentExercise.exerciseHistory?.[
@@ -193,6 +200,7 @@ const SessionPage = () => {
           sessionExercise={currentSessionExercise}
           onSetReps={handleSetReps}
           onSetWeight={handleSetWeight}
+          onSetAthleteNotes={handleSetAthleteNotes}
         />
       </div>
 

@@ -11,3 +11,4 @@ export const fetcher = (url: string) => fetch(url, { credentials: "include" }).t
 
 
 //seteo de info de atleta en local storage y en el store
+

@@ -20,10 +20,8 @@ const SetCard = ({ value, onInc, onDec, min, max, label }: SetCardProps) => {
 
   return (
     <div
-      className={`flex items-center justify-between p-3 rounded-lg border bg-background transition-colors
-                  ${isAtMax ? "border-green-300 bg-green-50" : "border-gray-200"}
-                  ${isAtMin ? "border-gray-200" : "border-blue-200"}`}
-    >
+      className={`flex items-center justify-between p-3 rounded-lg border transition-colors
+                  ${isAtMax && "border-green-300"}`}>
       <span className="font-medium text-sm">{label}</span>
 
       <div className="flex items-center gap-3">
