@@ -205,7 +205,7 @@ const SessionPage = () => {
       </div>
 
       {/* Footer con navegación */}
-      <div className="bg-background border-t p-4 flex-shrink-0">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 flex-shrink-0">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <Button
             variant="outline"
