@@ -18,17 +18,20 @@ const AthleteLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const fetchAthlete = async () => {
-      const response = await getAthleteById(params.id as string);
-      const data = await response.json();
-      setAthlete(data);
-      localStorage.setItem("athlete", JSON.stringify(data));
+      try {
+        const response = await getAthleteById(params.id as string);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setAthlete(data);
+        localStorage.setItem("athlete", JSON.stringify(data));
+      } catch (error) {
+        console.error("Error fetching athlete:", error);
+      }
     };
 
-    // if (localStorage.getItem("athlete")) {
-    //   setAthlete(JSON.parse(localStorage.getItem("athlete") || ""));
-    // } else {
-      fetchAthlete();
-    // }
+    fetchAthlete();
   }, [params.id]);
 
   // Renderizar children cuando el atleta esté cargado
