@@ -27,6 +27,7 @@ const AthleteNotes = ({
   }, [notes]);
 
   return (
+    <div className="w-full pb-16">
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
@@ -60,7 +61,7 @@ const AthleteNotes = ({
           </Button>
         </div>
       </DialogContent>
-    </Dialog>
+    </Dialog></div>
   );
 };
 
