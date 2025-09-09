@@ -176,6 +176,7 @@ const NewAthletePage = () => {
                   routine={routine}
                   setRoutine={setRoutine}
                   isNewRoutine={true}
+                  athleteId="" // Add this prop
                 />
               )}
             </CardContent>
