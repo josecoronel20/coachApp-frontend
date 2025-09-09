@@ -1,3 +1,5 @@
+import { SessionExercise } from "@/store/useAthleteSessionStore";
+
 // Tipos adicionales para la sesión de entrenamiento
 // Estos tipos pueden ser útiles para futuras integraciones
 
@@ -40,5 +42,12 @@ export interface SessionBackup {
   athleteId: string;
   dayIndex: number;
   timestamp: number;
-  data: any; // sessionProgress
+  data: SessionExercise[]; // Especificar el tipo correcto
+}
+
+export interface SessionSnapshot {
+  athleteId: string;
+  dayIndex: number;
+  timestamp: number;
+  data: SessionExercise[]; // Especificar el tipo correcto
 }
