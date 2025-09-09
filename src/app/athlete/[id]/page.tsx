@@ -109,15 +109,16 @@ const AthletePage = () => {
               {selectedDayExercises.map((exercise, exerciseIndex) => (
                 <div
                   key={exerciseIndex}
-                  className={`flex items-center justify-between p-3 ${exerciseIndex !== selectedDayExercises.length - 1 ? "border-b" : ""}`}
+                  className={`grid grid-cols-4 items-center p-3 ${
+                    exerciseIndex !== selectedDayExercises.length - 1
+                      ? "border-b"
+                      : ""
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    
-                    <span className="text-foreground">
-                      {exercise.exercise}
-                    </span>
+                  <div className="flex items-center gap-3 col-span-3">
+                    <span className="text-foreground">{exercise.exercise}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground col-span-1 justify-self-end">
                     <span className="font-medium">{exercise.sets} x </span>
                     <span>
                       {exercise.rangeMin}-{exercise.rangeMax}

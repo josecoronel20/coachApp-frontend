@@ -116,7 +116,10 @@ const ExerciseView = ({
         )}
 
         {/* Campo de peso */}
-        <ExerciseWeight weight={exerciseDefinition.weight || 0} />
+        <ExerciseWeight 
+          weight={sessionExercise.weight || exerciseDefinition.lastHistory?.weight || 0} 
+          onWeightChange={onSetWeight}
+        />
       </div>
 
       {exerciseDefinition.coachNotes && (
