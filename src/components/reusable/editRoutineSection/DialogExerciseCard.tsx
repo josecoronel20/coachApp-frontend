@@ -56,7 +56,7 @@ const DialogExerciseCard = ({
       rangeMax: data.rangeMax,
       coachNotes: data.coachNotes,
       athleteNotes: exercise?.athleteNotes || "",
-      exerciseHistory: exercise?.exerciseHistory || null,
+      exerciseHistory: exercise?.exerciseHistory || null, // Preservar el historial existente
     };
 
     let newRoutine: Routine;
