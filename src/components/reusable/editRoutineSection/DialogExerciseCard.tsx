@@ -9,38 +9,37 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Check, Save } from "lucide-react";
-import { updateRoutine } from "@/app/api/protected";
-import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
-import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
 import {
   Exercise,
-  NewExercise,
+  ExerciseHistory,
   Routine,
-  NewRoutine,
 } from "@/types/routineType";
+import { updateRoutine } from "@/app/api/protected";
 
 interface DialogExerciseCardProps {
-  idAthlete: string;
-  exercise: Exercise | NewExercise;
-  isNewRoutine: boolean;
-  indexExercise: number;
+  exercise: Exercise | null;
+  indexExercise: number | null;
   indexDay: number;
+  lastSession: ExerciseHistory | null;
+  routine: Routine;
+  setRoutine: (routine: Routine) => void;
   setIsEditing: (isEditing: boolean) => void;
-  routine: Routine | NewRoutine;
   closeDialog: () => void;
-  isAddingNew?: boolean; // New prop to indicate if we're adding a new exercise
+  athleteId: string;
+  isNewRoutine: boolean;
 }
 
 const DialogExerciseCard = ({
-  idAthlete,
   exercise,
-  isNewRoutine,
   indexExercise,
   indexDay,
   routine,
+  lastSession,
+  setRoutine,
   closeDialog,
   setIsEditing,
-  isAddingNew = false,
+  athleteId,
+  isNewRoutine,
 }: DialogExerciseCardProps) => {
   const {
     register,
@@ -48,81 +47,63 @@ const DialogExerciseCard = ({
     formState: { errors },
   } = useForm();
   const [messageError, setMessageError] = useState("");
-  const { mutate: mutateAllAthletes } = useGetAllAthletes();
-  const { mutate: mutateCurrentAthlete } = useGetAthleteInfo(idAthlete);
-  const [routineUpdate, setRoutineUpdate] = useState<Routine | NewRoutine>(
-    routine
-  );
-  const [athleteNote, setAthleteNote] = useState(
-    "athleteNotes" in exercise ? exercise.athleteNotes : ""
-  );
-
-  const lastSession =
-    "exerciseHistory" in exercise
-      ? exercise.exerciseHistory[exercise.exerciseHistory.length - 1]
-      : null;
-
-  const handleAthleteNote = () => {
-    setAthleteNote("");
-    const exerciseUpdateWithCurrentAthleteNote = {
-      ...exercise,
-      athleteNotes: "",
-    };
-    setRoutineUpdate(
-      routineUpdate.map((day, dIdx) =>
-        dIdx === indexDay
-          ? day.map((ex, eIdx) =>
-              eIdx === indexExercise
-                ? { ...ex, ...exerciseUpdateWithCurrentAthleteNote }
-                : ex
-            )
-          : day
-      )
-    );
-  };
 
   const onSubmit = async (data: FieldValues) => {
-    const newExerciseData = {
-      ...data,
-      exercise: data.exercise.trim(),
-      sets: Number(data.sets),
-      rangeMin: Number(data.rangeMin),
-      rangeMax: Number(data.rangeMax),
-      coachNotes: data.coachNotes?.trim() || null,
+    const exerciseUpdate: Exercise = {
+      exercise: data.exercise,
+      sets: data.sets,
+      rangeMin: data.rangeMin,
+      rangeMax: data.rangeMax,
+      coachNotes: data.coachNotes,
+      athleteNotes: exercise?.athleteNotes || "",
+      exerciseHistory: exercise?.exerciseHistory || null,
     };
 
-    if (isAddingNew) {
-      // Add new exercise to the end of the current day
-      setRoutineUpdate(
-        routine.map((day, dIdx) =>
-          dIdx === indexDay ? [...day, newExerciseData] : day
-        )
+    let newRoutine: Routine;
+
+    //si es un nuevo ejercicio se agrega al final del dia
+    if (indexExercise === null) {
+      newRoutine = routine.map((day, dIdx) =>
+        dIdx === indexDay ? [...day, exerciseUpdate] : day
       );
     } else {
-      // Update existing exercise
-      setRoutineUpdate(
-        routineUpdate.map((day, dIdx) =>
-          dIdx === indexDay
-            ? day.map((ex, eIdx) =>
-                eIdx === indexExercise ? { ...ex, ...newExerciseData } : ex
-              )
-            : day
-        )
+      //si es un ejercicio existente se actualiza en el indice indicado
+      newRoutine = routine.map((day, dIdx) =>
+        dIdx === indexDay ? day.map((ex, eIdx) => eIdx === indexExercise ? exerciseUpdate : ex) : day
       );
     }
 
-    const response = await updateRoutine(idAthlete, routineUpdate as Routine);
-    console.log("routineUpdate", routineUpdate);
-    if (response.status === 200) {
-      console.log(newExerciseData);
-      console.log("rutina actualizada con éxito", routineUpdate);
-      mutateAllAthletes();
-      mutateCurrentAthlete();
-      closeDialog();
-    } else {
-      const data = await response.json();
-      setMessageError(data.message);
+    // Actualizar el estado local
+    setRoutine(newRoutine);
+
+    // Actualizar en la base de datos si no es una rutina nueva
+    if (!isNewRoutine) {
+      try {
+        const response = await updateRoutine(athleteId, newRoutine);
+        if (!response.ok) {
+          // Si falla, revertir el estado
+          setRoutine(routine);
+          console.error('Error al actualizar la rutina');
+          setMessageError('Error al guardar el ejercicio');
+          return;
+        }
+      } catch (error) {
+        // Si falla, revertir el estado
+        setRoutine(routine);
+        console.error('Error al actualizar la rutina:', error);
+        setMessageError('Error al guardar el ejercicio');
+        return;
+      }
     }
+
+    setIsEditing(false);
+    closeDialog();
+  };
+
+  const handleAthleteNote = () => {
+    setRoutine(routine.map((day, dIdx) =>
+      dIdx === indexDay ? day.map((ex, eIdx) => eIdx === indexExercise ? { ...ex, athleteNotes: ex.athleteNotes } : ex) : day
+    ));
   };
 
   return (
@@ -135,7 +116,7 @@ const DialogExerciseCard = ({
 
       <DialogHeader>
         <DialogTitle className="text-base">
-          {isAddingNew ? "Agregar nuevo ejercicio" : "Editar ejercicio"}
+          {exercise ? "Editar ejercicio" : "Agregar nuevo ejercicio"}
         </DialogTitle>
       </DialogHeader>
 
@@ -144,7 +125,7 @@ const DialogExerciseCard = ({
         <div>
           <label className="text-sm font-medium">Ejercicio</label>
           <Input
-            defaultValue={exercise.exercise}
+            defaultValue={exercise?.exercise}
             type="text"
             className={`h-8 text-sm ${errors.exercise ? "border-red-500" : ""}`}
             {...register("exercise", { required: true })}
@@ -157,7 +138,7 @@ const DialogExerciseCard = ({
           <div>
             <label className="text-sm font-medium">Series</label>
             <Input
-              defaultValue={exercise.sets}
+              defaultValue={exercise?.sets}
               type="number"
               className={`h-8 w-14 text-sm text-center ${
                 errors.sets ? "border-red-500" : ""
@@ -172,7 +153,7 @@ const DialogExerciseCard = ({
             <div className="flex justify-between items-center text-sm w-full">
               <span>Entre</span>
               <Input
-                defaultValue={exercise.rangeMin}
+                defaultValue={exercise?.rangeMin}
                 type="number"
                 className={`h-8 w-14 text-sm text-center ${
                   errors.rangeMin ? "border-red-500" : ""
@@ -183,7 +164,7 @@ const DialogExerciseCard = ({
               />
               <span>y</span>
               <Input
-                defaultValue={exercise.rangeMax}
+                defaultValue={exercise?.rangeMax}
                 type="number"
                 className={`h-8 w-14 text-sm text-center ${
                   errors.rangeMax ? "border-red-500" : ""
@@ -198,7 +179,7 @@ const DialogExerciseCard = ({
         </div>
 
         {/* Weight and reps*/}
-        {!isNewRoutine && (
+        {exercise && (
           <div className="flex flex-col">
             <p className="text-sm font-medium">
               Info editable solo por el atleta
@@ -224,19 +205,19 @@ const DialogExerciseCard = ({
         <div>
           <label className="text-sm font-medium">Nota del entrenador</label>
           <Textarea
-            defaultValue={exercise.coachNotes || ""}
+            defaultValue={exercise?.coachNotes || ""}
             className="text-sm min-h-[60px]"
             {...register("coachNotes")}
             placeholder="Agregar notas o instrucciones especiales..."
           />
         </div>
 
-        {!isNewRoutine && (
+        {exercise && (
           <div>
             <p className="text-sm font-medium">Nota del atleta</p>
-            {athleteNote !== "" ? (
+            {exercise?.athleteNotes !== "" ? (
               <div className="text-sm text-red-400 border border-red-400 rounded-md p-2 flex justify-between items-center">
-                <p>{athleteNote}</p>
+                <p>{exercise?.athleteNotes}</p>
                 <Button
                   variant="outline"
                   size="icon"
@@ -266,7 +247,7 @@ const DialogExerciseCard = ({
           </Button>
           <Button type="submit" className="h-8 text-sm">
             <Save className="h-4 w-4 mr-1" />
-            {isAddingNew ? "Agregar" : "Guardar"}
+            {indexExercise === null ? "Agregar" : "Guardar"}
           </Button>
         </div>
       </form>

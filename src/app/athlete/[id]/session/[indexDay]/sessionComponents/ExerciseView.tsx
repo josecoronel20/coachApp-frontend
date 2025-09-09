@@ -46,9 +46,11 @@ const ExerciseView = ({
   onSetAthleteNotes,
 }: ExerciseViewProps) => {
   const { athlete } = useAthleteStore();
-  const [repsTracked, setRepsTracked] = useState<boolean>(athlete?.repsTracked || false);
+  const [repsTracked, setRepsTracked] = useState<boolean>(
+    athlete?.repsTracked || false
+  );
   const idFromParams = useParams().id as string;
-  
+
   const handleSetReps = (setIndex: number, newReps: number) => {
     onSetReps(setIndex, newReps);
   };
@@ -88,9 +90,9 @@ const ExerciseView = ({
         </p>
       </details>
 
-      <div className="grid grid-cols-2 items-center gap-2">
+      <div className={`${repsTracked ? "grid grid-cols-2 items-center gap-2" : "grid grid-cols-1 items-center gap-2"}`}>
         {/* Información de última sesión (solo referencia visual) */}
-        {exerciseDefinition.lastHistory && (
+        {exerciseDefinition.lastHistory && repsTracked && (
           <div className=" p-4 bg-muted rounded-lg col-span-1">
             <h4 className="text-sm font-medium text-muted-foreground mb-2">
               Última sesión (referencia)
@@ -103,14 +105,12 @@ const ExerciseView = ({
                 </span>
               </p>
 
-              {repsTracked && (
-                <p>
-                  Reps:{" "}
-                  <span className="font-semibold text-foreground">
-                    {exerciseDefinition.lastHistory.sets.join(" - ")}
-                  </span>
-                </p>
-              )}
+              <p>
+                Reps:{" "}
+                <span className="font-semibold text-foreground">
+                  {exerciseDefinition.lastHistory.sets.join(" - ")}
+                </span>
+              </p>
             </div>
           </div>
         )}

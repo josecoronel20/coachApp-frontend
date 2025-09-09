@@ -1,6 +1,6 @@
 "use client";
 import { Athlete } from "@/types/athleteType";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -17,14 +17,22 @@ import SkeletonAthleteDetail from "./athleteDetailsComponents/SkeletonAthleteDet
 import { deleteAthlete } from "@/app/api/protected";
 import { useRouter } from "next/navigation";
 import { DeleteButton } from "@/components/reusable/DeleteButton";
-import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
+import { Routine } from "@/types/routineType";
 
 const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
-  const { data, isLoading, mutate } = useGetAthleteInfo(id);
+  const { data, isLoading } = useGetAthleteInfo(id);
+  console.log(data);
+  const [routine, setRoutine] = useState<Routine>([]);
   const athlete = data as Athlete;
   const router = useRouter();
-  const { mutate: mutateAllAthletes } = useGetAllAthletes();
+
+  useEffect(() => {
+    if (athlete && athlete.routine) {
+      setRoutine(athlete.routine);
+    }
+  }, [athlete]);
+
   // If athlete is not found, show error message
   if (isLoading || !athlete) {
     return <SkeletonAthleteDetail />;
@@ -42,7 +50,6 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
   const handleDeleteAthlete = async () => {
     const response = await deleteAthlete(athlete.id);
     if (response.status === 200) {
-      mutateAllAthletes();
       router.push("/dashboard");
     }
   };
@@ -85,14 +92,12 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
                                  {/* Athlete Info */}
                  <AthleteInfo 
                    athlete={athlete} 
-                   mutate={mutate}
                  />
 
                 {/* Payment Info */}
                 <PaymentSection
                   paymentDate={athlete.paymentDate}
                   athleteId={athlete.id}
-                  mutate={mutate}
                 />
 
                 {/* Delete Athlete */}
@@ -112,8 +117,9 @@ const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => 
               </CardHeader>
               <CardContent>
                 <EditRoutineSection
-                  routine={athlete.routine}
+                  routine={routine}
                   isNewRoutine={false}
+                  setRoutine={setRoutine}
                   athleteId={athlete.id}
                 />
               </CardContent>

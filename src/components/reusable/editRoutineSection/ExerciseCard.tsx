@@ -1,41 +1,60 @@
 import React, { useState } from "react";
-import {
-  Exercise,
-  NewExercise,
-  NewRoutine,
-  Routine,
-} from "@/types/routineType";
+import { Exercise, Routine } from "@/types/routineType";
 import DialogExerciseCard from "./DialogExerciseCard";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Edit } from "lucide-react";
 import { DeleteButton } from "../DeleteButton";
+import { updateRoutine } from "@/app/api/protected";
 
 interface ExerciseCardProps {
-  exercise: Exercise | NewExercise;
+  exercise: Exercise;
   indexExercise: number;
   indexDay: number;
+  routine: Routine;
+  setRoutine: (routine: Routine) => void;
+  athleteId: string;
   isNewRoutine: boolean;
-  idAthlete: string;
-  routine: Routine | NewRoutine;
-  handleDeleteExercise: () => void;
 }
 
 const ExerciseCard = ({
   exercise,
   indexExercise,
-  indexDay,
-  isNewRoutine,
-  idAthlete,
   routine,
-  handleDeleteExercise,
+  setRoutine,
+  indexDay,
+  athleteId,
+  isNewRoutine,
 }: ExerciseCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const lastSession =
-    "exerciseHistory" in exercise && exercise.exerciseHistory.length > 0
+    exercise.exerciseHistory !== null && exercise.exerciseHistory.length > 0
       ? exercise.exerciseHistory[exercise.exerciseHistory.length - 1]
       : null;
+
+  const handleDeleteExercise = async () => {
+    if (!isNewRoutine) {
+      const response = await updateRoutine(athleteId, routine);
+      if (response.ok) {
+        setRoutine(
+          routine.map((day, dIdx) =>
+            dIdx === indexDay
+              ? day.filter((ex, eIdx) => eIdx !== indexExercise)
+              : day
+          )
+        );
+      }
+    } else {
+      setRoutine(
+        routine.map((day, dIdx) =>
+          dIdx === indexDay
+            ? day.filter((ex, eIdx) => eIdx !== indexExercise)
+            : day
+        )
+      );
+    }
+  };
 
   return (
     <div
@@ -50,7 +69,10 @@ const ExerciseCard = ({
 
             <div className="flex items-center gap-2">
               {/* delete button */}
-              <DeleteButton label="ejercicio" handleDelete={handleDeleteExercise} />
+              <DeleteButton
+                label="ejercicio"
+                handleDelete={() => handleDeleteExercise()}
+              />
 
               {/* edit button */}
               <Button
@@ -72,35 +94,37 @@ const ExerciseCard = ({
             {exercise.rangeMin} y {exercise.rangeMax}
           </p>
 
-          {/* Weights only if it is no a new routine */}
-          { lastSession && lastSession.weight && (
-              <p className=" text-muted-foreground">
-                <span className="font-medium">peso actual:</span> {lastSession.weight + " kg"}
-              </p>
-            )}
-
-          {/* reps only if history exists */}
-          { lastSession && lastSession.sets && (
-              <p className=" text-muted-foreground">
-                <span className="font-medium">reps actuales:</span> {lastSession.sets.join(" - ")}
-              </p>
-            )}
-
-          {/* Coach notes */}
-          {exercise.coachNotes && (
-            <p className="text-blue-400">
-              <span className="font-medium">Nota del profe:</span>{" "}
-              {exercise.coachNotes}
+          {/* Weights only if it has history */}
+          {lastSession !== null && lastSession.weight && (
+            <p className=" text-muted-foreground">
+              <span className="font-medium">peso actual:</span>{" "}
+              {lastSession.weight + " kg"}
             </p>
           )}
 
+          {/* reps only if history exists */}
+          {lastSession !== null && lastSession.sets && (
+            <p className=" text-muted-foreground">
+              <span className="font-medium">reps actuales:</span>{" "}
+              {lastSession.sets.join(" - ")}
+            </p>
+          )}
+
+          {/* Coach notes */}
+          <p className="text-blue-400">
+            <span className="font-medium">Nota del entrenador:</span>{" "}
+            {exercise.coachNotes !== ""
+              ? exercise.coachNotes
+              : "Sin nota del entrenador"}
+          </p>
+
           {/* Athlete notes only if it exists */}
-          { "athleteNotes" in exercise && exercise.athleteNotes && (
-              <p className="text-red-400">
-                <span className="font-medium">Nota del atleta:</span>{" "}
-                {exercise.athleteNotes}
-              </p>
-            )}
+          {exercise.athleteNotes !== "" && (
+            <p className="text-red-400">
+              <span className="font-medium">Nota del atleta:</span>{" "}
+              {exercise.athleteNotes}
+            </p>
+          )}
         </div>
 
         {/* dialog */}
@@ -117,14 +141,16 @@ const ExerciseCard = ({
             </DialogTrigger>
 
             <DialogExerciseCard
-              idAthlete={idAthlete}
               exercise={exercise}
               indexExercise={indexExercise}
               indexDay={indexDay}
-              isNewRoutine={isNewRoutine}
               setIsEditing={setIsEditing}
               routine={routine}
+              lastSession={lastSession}
+              setRoutine={setRoutine}
               closeDialog={() => setIsEditing(false)}
+              athleteId={athleteId}
+              isNewRoutine={isNewRoutine}
             />
           </Dialog>
         )}

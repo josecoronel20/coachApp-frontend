@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Save, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
-import { NewRoutine, Routine } from "@/types/routineType";
+import { Routine } from "@/types/routineType";
 import { useForm } from "react-hook-form";
 import EditRoutineSection from "@/components/reusable/editRoutineSection/EditRoutineSection";
 import { NewAthlete } from "@/types/athleteType";
@@ -34,45 +34,12 @@ const NewAthletePage = () => {
 
   const formValues = watch();
   const [isRoutineParsed, setIsRoutineParsed] = useState(false);
-  const [routine, setRoutine] = useState<NewRoutine>([]);
+  const [routine, setRoutine] = useState<Routine>([]);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogData, setDialogData] = useState<{
     isSuccess: boolean;
     message: string;
   }>({ isSuccess: false, message: "" });
-
-  // Rutina simulada que se generará al presionar "Transformar rutina"
-  const mockParsedRoutine: NewRoutine = [
-    [
-      {
-        exercise: "Bench Press",
-        sets: [8, 8, 8],
-        range: [8, 10],
-        coachNotes: "cuiado con el codo",
-      },
-      {
-        exercise: "Squat",
-        sets: [8, 8, 8],
-        range: [8, 10],
-        coachNotes: "cuiado con el codo",
-      },
-
-      {
-        exercise: "Squat",
-        sets: [8, 8, 8],
-        range: [8, 10],
-        coachNotes: "cuiado con el codo",
-      },
-    ],
-    [
-      {
-        exercise: "Deadlift",
-        sets: [8, 8, 8],
-        range: [8, 11],
-        coachNotes: "cuiado con la lumbar",
-      },
-    ],
-  ];
 
   const handleTransformRoutine = () => {
     // Simular el proceso de parseo con la API de OpenAI
@@ -80,23 +47,28 @@ const NewAthletePage = () => {
 
     // Simular delay de procesamiento
     setTimeout(() => {
-      setRoutine(mockParsedRoutine);
+      setRoutine([[]
+      ]);
       setIsRoutineParsed(true);
     }, 1000);
   };
 
   const handleCreateAthlete = async (data: NewAthlete) => {
+    console.log("handleCreateAthlete");
     try {
-      const response = await createNewAthlete({...data,routine:mockParsedRoutine as Routine});
+      const response = await createNewAthlete({
+        ...data,
+        routine: routine as Routine,
+      });
       const responseData = await response.json();
-      
+
       const isSuccess = response.status === 201;
       setDialogData({
         isSuccess,
-        message: responseData.message 
+        message: responseData.message,
       });
       setShowDialog(true);
-      
+
       if (isSuccess) {
         // Redirect to dashboard after successful creation
         setTimeout(() => {
@@ -106,14 +78,14 @@ const NewAthletePage = () => {
     } catch (error) {
       setDialogData({
         isSuccess: false,
-        message: "Error de conexión"
+        message: "Error de conexión",
       });
       setShowDialog(true);
     }
   };
 
   return (
-    <main className="min-h-screen bg-background pt-16">
+    <main className="min-h-screen bg-background pt-16 pb-10">
       {/* Header */}
       <header className="flex flex-col items-center justify-between p-4 border-b bg-card gap-4">
         <div className="flex items-center gap-4 justify-between w-full">
@@ -125,7 +97,8 @@ const NewAthletePage = () => {
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Nuevo Atleta</h1>
         </div>
-
+      </header>
+      <div className="fixed bottom-0 w-full bg-background p-2">
         <Button
           onClick={() => handleCreateAthlete(formValues as NewAthlete)}
           className="bg-primary hover:bg-primary/90 w-full"
@@ -134,7 +107,7 @@ const NewAthletePage = () => {
           <Plus className="h-4 w-4 mr-2" />
           Crear Nuevo Atleta
         </Button>
-      </header>
+      </div>
 
       <div className="container mx-auto p-6 max-w-4xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -148,10 +121,7 @@ const NewAthletePage = () => {
                 <label className="block text-sm font-medium mb-2">
                   Nombre *
                 </label>
-                <Input
-                  {...register("name")}
-                  placeholder="Nombre completo"
-                />
+                <Input {...register("name")} placeholder="Nombre completo" />
               </div>
 
               <div>
@@ -169,10 +139,7 @@ const NewAthletePage = () => {
                 <label className="block text-sm font-medium mb-2">
                   Teléfono *
                 </label>
-                <Input
-                  {...register("phone")}
-                  placeholder="+1234567890"
-                />
+                <Input {...register("phone")} placeholder="+1234567890" />
               </div>
             </CardContent>
           </Card>
@@ -205,7 +172,11 @@ const NewAthletePage = () => {
                   </Button>
                 </div>
               ) : (
-                <EditRoutineSection routine={routine} isNewRoutine={true} />
+                <EditRoutineSection
+                  routine={routine}
+                  setRoutine={setRoutine}
+                  isNewRoutine={true}
+                />
               )}
             </CardContent>
           </Card>
@@ -225,14 +196,14 @@ const NewAthletePage = () => {
               {dialogData.isSuccess ? "Éxito" : "Error"}
             </DialogTitle>
           </DialogHeader>
-          <div className={`p-4 rounded-lg ${
-            dialogData.isSuccess 
-              ? "bg-green-50 border border-green-200 text-green-800" 
-              : "bg-red-50 border border-red-200 text-red-800"
-          }`}>
-            <p className="text-sm font-medium">
-              {dialogData.message}
-            </p>
+          <div
+            className={`p-4 rounded-lg ${
+              dialogData.isSuccess
+                ? "bg-green-50 border border-green-200 text-green-800"
+                : "bg-red-50 border border-red-200 text-red-800"
+            }`}
+          >
+            <p className="text-sm font-medium">{dialogData.message}</p>
           </div>
         </DialogContent>
       </Dialog>

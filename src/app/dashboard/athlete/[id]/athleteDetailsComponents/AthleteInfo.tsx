@@ -15,12 +15,8 @@ interface ErrorResponse {
 
 const AthleteInfo = ({
   athlete,
-  onSave,
-  mutate,
 }: {
   athlete: Athlete;
-  onSave?: (updatedAthlete: Partial<Athlete>) => void;
-  mutate: () => void;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -54,8 +50,8 @@ const AthleteInfo = ({
 
     const responseData = await response.json();
     if (response.status === 200) {
+      console.log(responseData)
       setIsEditing(false);
-      mutate()
     }else if (response.status === 400 || response.status === 404) {
       setResponseDataError(responseData);
     }

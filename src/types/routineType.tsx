@@ -12,22 +12,9 @@ export type Exercise = {
     rangeMax: number;
     coachNotes: string;
     athleteNotes: string;
-    exerciseHistory: ExerciseHistory[];
+    exerciseHistory: ExerciseHistory[] | null;
 }
 
 export type RoutineDay = Exercise[];
 
 export type Routine = RoutineDay[];
-
-//routine without athlete values
-export type NewExercise = {
-    exercise: string;
-    sets: number;
-    rangeMin: number;
-    rangeMax: number;
-    coachNotes: string;
-}
-
-export type NewRoutineDay = NewExercise[];
-
-export type NewRoutine = NewRoutineDay[];

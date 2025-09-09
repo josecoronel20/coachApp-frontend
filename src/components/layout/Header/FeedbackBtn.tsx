@@ -33,10 +33,10 @@ const FeedbackBtn = () => {
     athletes?.reduce(
       (acc: number, athlete: Athlete) =>
         acc +
-        athlete.routine.reduce(
+        (athlete.routine || []).reduce(
           (dayAcc: number, routineDay: RoutineDay) =>
             dayAcc +
-            routineDay.reduce(
+            (routineDay || []).reduce(
               (exerciseAcc: number, exercise: Exercise) =>
                 exerciseAcc + (exercise.athleteNotes !== null && exercise.athleteNotes !== "" ? 1 : 0),
               0
@@ -50,8 +50,8 @@ const FeedbackBtn = () => {
   const feedbackList: FeedbackItem[] =
     athletes
       ?.flatMap((athlete: Athlete) =>
-        athlete.routine.flatMap((routineDay: RoutineDay) =>
-          routineDay.map((exercise: Exercise) => ({
+        (athlete.routine || []).flatMap((routineDay: RoutineDay) =>
+          (routineDay || []).map((exercise: Exercise) => ({
             athleteId: athlete.id,
             athleteName: athlete.name,
             exerciseName: exercise.exercise,
@@ -59,7 +59,7 @@ const FeedbackBtn = () => {
           }))
         )
       )
-      .filter((feedback: FeedbackItem) => feedback.feedback !== null && feedback.feedback !== "") || [];
+      .filter((item: FeedbackItem) => item.feedback !== null && item.feedback !== "") || [];
 
   console.log(feedbackList);
 

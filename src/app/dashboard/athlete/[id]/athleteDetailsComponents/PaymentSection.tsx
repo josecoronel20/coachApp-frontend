@@ -5,20 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Calendar, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { updatePaymentDate } from "@/app/api/protected";
-import { KeyedMutator } from "swr";
-import { Athlete } from "@/types/athleteType";
 import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
 
 interface PaymentSectionProps {
   paymentDate: string;
   athleteId: string;
-  mutate: KeyedMutator<Athlete>;
 }
 
 const PaymentSection = ({
   paymentDate,
   athleteId,
-  mutate,
 }: PaymentSectionProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const {mutate: mutateAthletes} = useGetAllAthletes();
@@ -89,7 +85,6 @@ const PaymentSection = ({
     const response = await updatePaymentDate(athleteId, currentDate);
 
     if (response.ok) {
-      mutate();
       mutateAthletes();
     }
 

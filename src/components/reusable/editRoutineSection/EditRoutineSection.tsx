@@ -1,4 +1,4 @@
-import { Routine, NewRoutine, NewExercise } from "@/types/routineType";
+import { Routine } from "@/types/routineType";
 import { useState } from "react";
 import ExerciseCard from "./ExerciseCard";
 import SelectDay from "./SelectDay";
@@ -6,83 +6,58 @@ import DialogExerciseCard from "./DialogExerciseCard";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { updateRoutine } from "@/app/api/protected";
-import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
-import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
 import { DeleteButton } from "../DeleteButton";
 
 const EditRoutineSection = ({
   routine,
+  setRoutine,
   isNewRoutine,
   athleteId,
 }: {
-  routine: NewRoutine | Routine;
+  routine: Routine;
+  setRoutine: (routine: Routine) => void;
   isNewRoutine: boolean;
   athleteId: string;
 }) => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [isAddingExercise, setIsAddingExercise] = useState(false);
-  const { mutate: mutateAllAthletes } = useGetAllAthletes();
-  const { mutate: mutateCurrentAthlete } = useGetAthleteInfo(athleteId);
-  // Create a new exercise template
-  const newExerciseTemplate: NewExercise = {
-    exercise: "",
-    sets: 3,
-    rangeMin: 8,
-    rangeMax: 12,
-    coachNotes: "",
+
+  const handleDeleteDay = () => {
+    setRoutine(routine.filter((_, index) => index !== selectedDay));
   };
 
-  const handleDeleteExercise = async (indexExercise: number,athleteId: string) => {
-    const routineWithoutExercise = routine.map((day, index) =>
-      index === selectedDay ? day.filter((_, i) => i !== indexExercise) : day
-    );
-
-    const response = await updateRoutine(
-      athleteId,
-      routineWithoutExercise as Routine
-    );
-    if (response.status === 200) {
-      mutateAllAthletes();
-      mutateCurrentAthlete();
-    }
-  };
-
-  const handleDeleteDay = async () => {
-
-    const routineWithoutDay = routine.filter((_, i) => i !== selectedDay);
-    const response = await updateRoutine(athleteId, routineWithoutDay as Routine);
-    if (response.status === 200) {
-      mutateAllAthletes();
-      mutateCurrentAthlete();
-    }
-  };
 
   return (
     <div className="space-y-4">
       {/* Selector de días */}
       <SelectDay
         routine={routine}
+        setRoutine={setRoutine}
         selectedDay={selectedDay}
         setSelectedDay={setSelectedDay}
+        isNewRoutine={isNewRoutine}
         athleteId={athleteId}
       />
-      <DeleteButton label="día" handleDelete={handleDeleteDay} />
 
+      {/*Delete day button*/}
+      {routine.length > 1 && (
+      <DeleteButton label="día" handleDelete={() => handleDeleteDay()} />
+      )}
+      
       {/* Lista de ejercicios del día seleccionado */}
       {routine[selectedDay]?.length > 0 ? (
-      <div className="space-y-2">
-        {routine[selectedDay]?.map((exercise, index) => (
-          <ExerciseCard
-            key={index}
-            idAthlete={athleteId}
-            exercise={exercise}
-            indexExercise={index}
-            indexDay={selectedDay}
-            isNewRoutine={isNewRoutine}
-            routine={routine}
-            handleDeleteExercise={() => handleDeleteExercise(index,athleteId)}
-          />
+        <div className="space-y-2">
+          {routine[selectedDay]?.map((exercise, index) => (
+            <ExerciseCard
+              key={index}
+              routine={routine}
+              setRoutine={setRoutine}
+              exercise={exercise}
+              indexExercise={index}
+              indexDay={selectedDay}
+              athleteId={athleteId}
+              isNewRoutine={isNewRoutine}
+            />
           ))}
         </div>
       ) : (
@@ -107,15 +82,16 @@ const EditRoutineSection = ({
           </DialogTrigger>
 
           <DialogExerciseCard
-            idAthlete={athleteId}
-            exercise={newExerciseTemplate}
-            indexExercise={-1} // -1 indicates this is a new exercise
+            exercise={null}
             indexDay={selectedDay}
-            isNewRoutine={isNewRoutine}
+            indexExercise={null}
             setIsEditing={setIsAddingExercise}
+            lastSession={null}
             routine={routine}
+            setRoutine={setRoutine}
             closeDialog={() => setIsAddingExercise(false)}
-            isAddingNew={true}
+            athleteId={athleteId}
+            isNewRoutine={isNewRoutine}
           />
         </Dialog>
       </div>

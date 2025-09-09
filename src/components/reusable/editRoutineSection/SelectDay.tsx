@@ -1,44 +1,51 @@
 import {
   Routine,
-  NewRoutine,
   RoutineDay,
-  NewRoutineDay,
 } from "@/types/routineType";
 import { Button } from "@/components/ui/button";
 import { updateRoutine } from "@/app/api/protected";
-import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
-import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
 
 const SelectDay = ({
   routine,
+  setRoutine,
   selectedDay,
   setSelectedDay,
+  isNewRoutine,
   athleteId,
 }: {
-  routine: NewRoutine | Routine;
+  routine: Routine;
+  setRoutine: (routine: Routine) => void;
   selectedDay: number;
   setSelectedDay: (day: number) => void;
+  isNewRoutine: boolean;
   athleteId: string;
 }) => {
-  const { mutate: mutateAllAthletes } = useGetAllAthletes();
-  const { mutate: mutateCurrentAthlete } = useGetAthleteInfo(athleteId);
 
   const handleAddDay = async () => {
-if (routine.length === 7) {
-  return;
-}
-
-    const routineWithNewDay = [...routine, []];
-    const response = await updateRoutine(athleteId, routineWithNewDay as Routine);
-    if (response.status === 200) {
-      mutateAllAthletes();
-      mutateCurrentAthlete();
+    const newRoutine = [...routine, []];
+    
+    if (!isNewRoutine) {
+      setRoutine(newRoutine);
+      try {
+        const response = await updateRoutine(athleteId, newRoutine);
+        if (!response.ok) {
+          // Si falla, revertir el estado
+          setRoutine(routine);
+          console.error('Error al actualizar la rutina');
+        }
+      } catch (error) {
+        // Si falla, revertir el estado
+        setRoutine(routine);
+        console.error('Error al actualizar la rutina:', error);
+      }
+    } else {
+      setRoutine(newRoutine);
     }
   };
 
   return (
     <div className="flex gap-2 flex-wrap">
-      {routine.map((day: NewRoutineDay | RoutineDay, index: number) => (
+      {routine.map((day: RoutineDay, index: number) => (
         <Button
           key={index}
           variant={selectedDay === index ? "default" : "outline"}
@@ -49,8 +56,12 @@ if (routine.length === 7) {
         </Button>
       ))}
 
-
-      <Button variant="outline" size="sm" onClick={handleAddDay} className="text-xs">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handleAddDay()}
+        className="text-xs"
+      >
         Añadir día
       </Button>
     </div>
