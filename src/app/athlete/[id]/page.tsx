@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useAthleteStore } from "@/store/useAthleteStore";
 import BodyWeight from "./athleteViewComponents/BodyWeight";
+import DietInfo from "./athleteViewComponents/DietInfo";
 
 /**
  * Página principal del atleta que muestra:
@@ -74,9 +75,12 @@ const AthletePage = () => {
       <div className="max-w-2xl mx-auto space-y-6 flex flex-col">
         {/* Header */}
         <header className="text-center  border-b p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <h1 className="text-3xl font-bold text-primary">{athlete.name}</h1>
-            <BodyWeight />
+            <div className="flex items-center gap-2">
+              <BodyWeight />
+              <DietInfo />
+            </div>
           </div>
         </header>
 

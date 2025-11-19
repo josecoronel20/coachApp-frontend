@@ -29,6 +29,7 @@ const NewAthletePage = () => {
       routine: [],
       coachId: "",
       paymentDate: "",
+      diet: "",
     },
   });
 
@@ -76,6 +77,7 @@ const NewAthletePage = () => {
         }, 2000);
       }
     } catch (error) {
+      console.error("Error creating athlete:", error);
       setDialogData({
         isSuccess: false,
         message: "Error de conexión",
@@ -140,6 +142,17 @@ const NewAthletePage = () => {
                   Teléfono *
                 </label>
                 <Input {...register("phone")} placeholder="+1234567890" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Plan de dieta (opcional)
+                </label>
+                <Textarea
+                  {...register("diet")}
+                  placeholder="Describe la dieta del atleta..."
+                  rows={6}
+                />
               </div>
             </CardContent>
           </Card>

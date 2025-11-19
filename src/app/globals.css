@@ -59,7 +59,7 @@
   --muted-foreground: #333333;
   --accent: #4A0072;
   --accent-foreground: #FFFFFF;
-  --destructive: #a21f1f;
+  --destructive: #d34545;
   --border: #9E9E9E;
   --input: #9E9E9E;
   --ring: #7B1FA2;
@@ -93,7 +93,7 @@
   --muted-foreground: #9E9E9E;
   --accent: #4A0072;
   --accent-foreground: #FFFFFF;
-  --destructive: #a21f1f;
+  --destructive: #d34545;
   --border: #333333;
   --input: #333333;
   --ring: #7B1FA2;
@@ -119,4 +119,20 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes day-bump {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-day-bump {
+  animation: day-bump 0.28s ease;
 }

@@ -1,129 +1,58 @@
 "use client";
-import { Athlete } from "@/types/athleteType";
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  MessageCircle,
-  Calendar,
-  ArrowLeft,
-} from "lucide-react";
-import Link from "next/link";
-import EditRoutineSection from "@/components/reusable/editRoutineSection/EditRoutineSection";
-import PaymentSection from "./athleteDetailsComponents/PaymentSection";
-import AthleteInfo from "./athleteDetailsComponents/AthleteInfo";
-import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
-import SkeletonAthleteDetail from "./athleteDetailsComponents/SkeletonAthleteDetail";
-import { deleteAthlete } from "@/app/api/protected";
+
+import * as React from "react";
 import { useRouter } from "next/navigation";
-import { DeleteButton } from "@/components/reusable/DeleteButton";
-import { Routine } from "@/types/routineType";
+import type { Athlete } from "@/types/athleteType";
+import { deleteAthlete } from "@/app/api/protected";
+import { useGetAthleteInfo } from "@/hooks/useGetAthleteInfo";
+import AthleteHeader from "./components/AthleteHeader";
+import AthleteSummarySidebar from "./components/AthleteSummarySidebar";
+import SkeletonAthleteDetail from "./components/SkeletonAthleteDetail";
+import RoutineEditorCard from "./components/RoutineEditorCard";
 
-const AthleteDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
-  const { id } = React.use(params);
-  const { data, isLoading } = useGetAthleteInfo(id);
-  console.log(data);
-  const [routine, setRoutine] = useState<Routine>([]);
-  const athlete = data as Athlete;
+interface AthleteDetailsPageProps {
+  params: Promise<{ id: string }>;
+}
+
+/**
+ * Página de detalles del atleta dentro del dashboard del coach.
+ */
+const AthleteDetailsPage = ({ params }: AthleteDetailsPageProps) => {
   const router = useRouter();
+  const { id: athleteId } = React.use(params);
 
-  useEffect(() => {
-    if (athlete && athlete.routine) {
-      setRoutine(athlete.routine);
-    }
-  }, [athlete]);
-
-  // If athlete is not found, show error message
-  if (isLoading || !athlete) {
-    return <SkeletonAthleteDetail />;
-  }
-
-  const handleWhatsAppRoutine = () => {
-    // TODO: Implement WhatsApp routine sending
-    const message = `Hola ${athlete.name}! Aquí tienes tu rutina actualizada.`;
-    const whatsappUrl = `https://wa.me/${
-      athlete.phone
-    }?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-  };
+  const { data, isLoading, mutate } = useGetAthleteInfo(athleteId);
+  const athlete = data as Athlete | undefined;
 
   const handleDeleteAthlete = async () => {
+    if (!athlete) return;
+
     const response = await deleteAthlete(athlete.id);
-    if (response.status === 200) {
+    if (response.ok) {
       router.push("/dashboard");
     }
   };
 
+  if (isLoading || !athlete) {
+    return <SkeletonAthleteDetail />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
-      {/* Header */}
-      <div className="bg-card border-b border-border shadow-sm p-2">
-        <div className="">
-          <div className="flex flex-col justify-between items-center w-full gap-2">
-            <div className="flex gap-4 items-center space-x-4 w-full justify-between">
-              <Link href="/dashboard">
-                <Button variant="outline">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Volver
-                </Button>
-              </Link>
-              <h1 className="text-xl font-semibold text-foreground">
-                {athlete.name}
-              </h1>
-            </div>
-            <Button
-              onClick={handleWhatsAppRoutine}
-              className="w-full bg-green-800 hover:bg-green-700 hover:text-white text-white"
-            >
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Enviar rutina por WhatsApp
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted pt-16">
+      <AthleteHeader athlete={athlete} />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-background">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Athlete Quick Info Card */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardContent className="space-y-4">
-                                 {/* Athlete Info */}
-                 <AthleteInfo 
-                   athlete={athlete} 
-                 />
-
-                {/* Payment Info */}
-                <PaymentSection
-                  paymentDate={athlete.paymentDate}
-                  athleteId={athlete.id}
-                />
-
-                {/* Delete Athlete */}
-                <DeleteButton label="atleta" handleDelete={handleDeleteAthlete} />
-              </CardContent>
-            </Card>
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-1 min-w-0">
+            <AthleteSummarySidebar
+              athlete={athlete}
+              onDelete={handleDeleteAthlete}
+              onDietSaved={() => mutate()}
+            />
           </div>
 
-          {/* Routine Section */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <span>Rutina de Entrenamiento</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <EditRoutineSection
-                  routine={routine}
-                  isNewRoutine={false}
-                  setRoutine={setRoutine}
-                  athleteId={athlete.id}
-                />
-              </CardContent>
-            </Card>
+          <div className="lg:col-span-2 min-w-0">
+            <RoutineEditorCard athleteId={athlete.id} initialRoutine={athlete.routine} />
           </div>
         </div>
       </main>

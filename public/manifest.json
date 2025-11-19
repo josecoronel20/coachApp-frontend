@@ -1,0 +1,62 @@
+{
+  "name": "CoachApp - Gestión de Atletas",
+  "short_name": "CoachApp",
+  "description": "Aplicación para entrenadores para gestionar atletas, rutinas y sesiones de entrenamiento",
+  "start_url": "/?source=pwa",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "categories": ["fitness", "health", "sports"],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Gestion de Atletas",
+      "short_name": "Gestion de Atletas",
+      "description": "Acceso directo al dashboard del entrenador",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/logo-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    
+    {
+      "name": "Rutina",
+      "short_name": "Rutina",
+      "description": "Acceso directo a rutinas de entrenamiento",
+      "url": "/athlete",
+      "icons": [
+        {
+          "src": "/logo-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

@@ -68,20 +68,40 @@ const ExerciseView = ({
   ];
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-4 p-4">
       {/* Título del ejercicio */}
 
       <div className="flex justify-between items-center gap-2">
-        <h1 className="text-2xl text-center font-bold text-foreground">
-          {exerciseDefinition.name}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {exerciseDefinition.setsCount} series de {exerciseDefinition.rangeMin}{" "}
-          a {exerciseDefinition.rangeMax} reps
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">
+            {exerciseDefinition.name}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {exerciseDefinition.setsCount} series de{" "}
+            {exerciseDefinition.rangeMin} a {exerciseDefinition.rangeMax} reps
+          </p>
+        </div>
+
+        {/* Toggle para modo de registro */}
+        <div className="flex items-center gap-3 p-2 rounded-lg cursor-pointer  ">
+          <Switch
+            id="repsTracked"
+            checked={repsTracked}
+            onCheckedChange={handleSetRepsTracked}
+            className="data-[state=checked]:bg-primary"
+          />
+          <Label
+            htmlFor="repsTracked"
+            className="text-xs"
+          >
+            {repsTracked
+              ? "Modo detallado"
+              : "Modo simple"}
+          </Label>
+        </div>
       </div>
 
-      <details className="w-full flex flex-col bg-muted rounded-lg p-2">
+      <details className="w-full flex flex-col  rounded-lg p-2 cursor-pointer">
         <summary className="text-sm text-foreground">
           Como progresar en el ejercicio?
         </summary>
@@ -90,7 +110,13 @@ const ExerciseView = ({
         </p>
       </details>
 
-      <div className={`${repsTracked ? "grid grid-cols-2 items-center gap-2" : "grid grid-cols-1 items-center gap-2"}`}>
+      <div
+        className={`${
+          repsTracked && exerciseDefinition.lastHistory
+            ? "grid grid-cols-2 items-center gap-2"
+            : "grid grid-cols-1 items-center gap-2"
+        }`}
+      >
         {/* Información de última sesión (solo referencia visual) */}
         {exerciseDefinition.lastHistory && repsTracked && (
           <div className=" p-4 bg-muted rounded-lg col-span-1">
@@ -116,8 +142,12 @@ const ExerciseView = ({
         )}
 
         {/* Campo de peso */}
-        <ExerciseWeight 
-          weight={sessionExercise.weight || exerciseDefinition.lastHistory?.weight || 0} 
+        <ExerciseWeight
+          weight={
+            sessionExercise.weight ||
+            exerciseDefinition.lastHistory?.weight ||
+            0
+          }
           onWeightChange={onSetWeight}
         />
       </div>
@@ -130,24 +160,6 @@ const ExerciseView = ({
           {exerciseDefinition.coachNotes}
         </p>
       )}
-
-      {/* Toggle para modo de registro */}
-      <div className="flex items-center gap-3 p-2 rounded-lg border bg-muted">
-        <Switch
-          id="repsTracked"
-          checked={repsTracked}
-          onCheckedChange={handleSetRepsTracked}
-          className="data-[state=checked]:bg-green-500"
-        />
-        <Label
-          htmlFor="repsTracked"
-          className="cursor-pointer text-sm font-medium"
-        >
-          {repsTracked
-            ? "Modo detallado (anotar todas las series)"
-            : "Modo simple (rango de repeticiones)"}
-        </Label>
-      </div>
 
       {/* Sets y reps */}
       {repsTracked ? (

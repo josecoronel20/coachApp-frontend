@@ -14,7 +14,7 @@ import { Athlete } from "@/types/athleteType";
  */
 const AthleteLayout = ({ children }: { children: React.ReactNode }) => {
   const params = useParams();
-  const { setAthlete } = useAthleteStore();
+  const { setAthlete, athlete } = useAthleteStore();
 
   useEffect(() => {
     const fetchAthlete = async () => {
@@ -32,8 +32,10 @@ const AthleteLayout = ({ children }: { children: React.ReactNode }) => {
     };
 
     fetchAthlete();
-  }, [params.id]);
 
+  }, [params.id]);
+  
+  console.log("athlete", athlete);
   // Renderizar children cuando el atleta esté cargado
   return <>{children}</>;
 };

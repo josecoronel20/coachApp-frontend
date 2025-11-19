@@ -9,11 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Check, Save } from "lucide-react";
-import {
-  Exercise,
-  ExerciseHistory,
-  Routine,
-} from "@/types/routineType";
+import { Exercise, ExerciseHistory, Routine } from "@/types/routineType";
 import { updateRoutine } from "@/app/api/protected";
 
 interface DialogExerciseCardProps {
@@ -69,41 +65,53 @@ const DialogExerciseCard = ({
     } else {
       //si es un ejercicio existente se actualiza en el indice indicado
       newRoutine = routine.map((day, dIdx) =>
-        dIdx === indexDay ? day.map((ex, eIdx) => eIdx === indexExercise ? exerciseUpdate : ex) : day
+        dIdx === indexDay
+          ? day.map((ex, eIdx) =>
+              eIdx === indexExercise ? exerciseUpdate : ex
+            )
+          : day
       );
     }
 
-    // Actualizar el estado local
-    setRoutine(newRoutine);
-
-    // Actualizar en la base de datos si no es una rutina nueva
+    // Actualizar en la base de datos primero si no es una rutina nueva
     if (!isNewRoutine) {
       try {
         const response = await updateRoutine(athleteId, newRoutine);
         if (!response.ok) {
-          // Si falla, revertir el estado
-          setRoutine(routine);
-          console.error('Error al actualizar la rutina');
-          setMessageError('Error al guardar el ejercicio');
+          // Si falla, no actualizar el estado y mostrar error
+          setMessageError("Error al guardar el ejercicio");
           return;
         }
+        // Si es exitoso, actualizar el estado local
+        setRoutine(newRoutine);
       } catch (error) {
-        // Si falla, revertir el estado
-        setRoutine(routine);
-        console.error('Error al actualizar la rutina:', error);
-        setMessageError('Error al guardar el ejercicio');
+        // Si falla, no actualizar el estado y mostrar error
+        console.error("Error al actualizar la rutina:", error);
+        setMessageError("Error al guardar el ejercicio");
         return;
       }
+    } else {
+      // Si es rutina nueva, solo actualizar el estado local
+      setRoutine(newRoutine);
     }
 
+    // Cerrar el diálogo solo después de actualizar exitosamente
     setIsEditing(false);
     closeDialog();
   };
 
   const handleAthleteNote = () => {
-    setRoutine(routine.map((day, dIdx) =>
-      dIdx === indexDay ? day.map((ex, eIdx) => eIdx === indexExercise ? { ...ex, athleteNotes: ex.athleteNotes } : ex) : day
-    ));
+    setRoutine(
+      routine.map((day, dIdx) =>
+        dIdx === indexDay
+          ? day.map((ex, eIdx) =>
+              eIdx === indexExercise
+                ? { ...ex, athleteNotes: ex.athleteNotes }
+                : ex
+            )
+          : day
+      )
+    );
   };
 
   return (
@@ -245,7 +253,10 @@ const DialogExerciseCard = ({
           >
             Cancelar
           </Button>
-          <Button type="submit" className="h-8 text-sm">
+          <Button
+            type="submit"
+            className="h-8 text-sm"
+          >
             <Save className="h-4 w-4 mr-1" />
             {indexExercise === null ? "Agregar" : "Guardar"}
           </Button>

@@ -42,6 +42,19 @@ export const updateAthleteBasicInfo = async (id: string, name: string, email: st
   return response;
 };
 
+export const updateAthleteDiet = async (id: string, diet: string) => {
+  const response = await fetch(`${API_URL}/api/protected/updateAthleteDiet`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify({ id, diet }),
+  });
+  return response;
+};
+
 export const updateRoutine = async (idAthlete: string, routine: Routine) => {
   const response = await fetch(`${API_URL}/api/protected/updateRoutine`, {
     method: "POST",

@@ -10,6 +10,7 @@ export type Athlete = {
     name: string;
     email: string;
     phone: string;
+    diet: string;
     routine: Routine;
 }
 
@@ -22,5 +23,6 @@ export type NewAthlete = {
     name: string;
     email: string;
     phone: string;
+    diet: string;
     routine: Routine;
 }

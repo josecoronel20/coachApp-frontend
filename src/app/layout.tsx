@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import PWAInstaller from "@/components/PWAInstaller";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -11,6 +12,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Rutinas y progreso en un link — PWA para entrenadores",
   description: "Plataforma PWA para entrenadores. Crea rutinas desde texto o IA, envía por WhatsApp y el atleta abre sin descargar ni registrarse. Gestión de progreso y cobros con MercadoPago.",
+  manifest: "/manifest.json",
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
@@ -39,6 +41,13 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="CoachApp" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -62,6 +71,7 @@ export default function RootLayout({
         }}
       >
         {children}
+        <PWAInstaller />
       </body>
     </html>
   );

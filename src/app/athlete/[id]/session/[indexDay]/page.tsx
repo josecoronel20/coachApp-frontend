@@ -172,11 +172,14 @@ const SessionPage = () => {
     <div className="h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="bg-background border-b p-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-semibold">
             Día {indexDay + 1} • Ejercicio {currentExerciseIndex + 1}/
             {sessionProgress.length}
-          </h1>
+          </h2>
+          <p className="font-medium text-muted-foreground">
+            {currentExercise.exercise}
+          </p>
         </div>
       </div>
 

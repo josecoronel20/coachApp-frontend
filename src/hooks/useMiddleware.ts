@@ -16,7 +16,7 @@ const router = useRouter();
         }
       }else{
         if (currentPath === "/auth/login" || currentPath === "/auth/register") {
-          router.push("/");
+          router.push("/dashboard");
         }
       }
     };

@@ -36,7 +36,7 @@ const AthleteNotes = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Tuviste alguna dificultad en el ejercicio?</DialogTitle>
+          <DialogTitle>Tuviste alguna dificultad con el ejercicio?</DialogTitle>
         </DialogHeader>
         <Textarea
           value={noteText}
