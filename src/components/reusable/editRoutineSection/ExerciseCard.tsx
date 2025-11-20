@@ -97,13 +97,11 @@ const ExerciseCard = ({
               {exercise.rangeMin} y {exercise.rangeMax}
             </p>
 
-            {/* Weights only if it has history */}
-            {lastSession !== null && lastSession.weight && (
-              <p className=" text-muted-foreground">
-                <span className="font-medium">peso actual:</span>{" "}
-                {lastSession.weight + " kg"}
-              </p>
-            )}
+            {/* Mostrar peso siempre; si no existe, mostrar 0 */}
+            <p className=" text-muted-foreground">
+              <span className="font-medium">peso actual:</span>{" "}
+              {(lastSession && lastSession.weight ? lastSession.weight : 0) + " kg"}
+            </p>
 
             {/* reps only if history exists */}
             {lastSession !== null && lastSession.sets && (

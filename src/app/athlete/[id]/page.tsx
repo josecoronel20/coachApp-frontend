@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { AlertCircle, Lock, ChevronRight } from "lucide-react";
 import { useAthleteStore } from "@/store/useAthleteStore";
 import BodyWeight from "./athleteViewComponents/BodyWeight";
 import DietInfo from "./athleteViewComponents/DietInfo";
+import { checkPaymentStatus } from "@/lib/paymentUtils";
 
 /**
  * Página principal del atleta que muestra:
@@ -28,6 +30,12 @@ const AthletePage = () => {
   // Obtener datos del atleta desde el store
   const { athlete } = useAthleteStore();
 
+  // Verificar estado del pago
+  const paymentStatus = useMemo(() => {
+    if (!athlete) return null;
+    return checkPaymentStatus(athlete.paymentDate);
+  }, [athlete]);
+
   // Asegurar que estamos en el cliente
   useEffect(() => {
     setIsClient(true);
@@ -46,13 +54,57 @@ const AthletePage = () => {
   }
 
   // Verificar que el atleta esté cargado
-  if (!athlete) {
+  if (!athlete || !paymentStatus) {
     return (
       <div className="h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Cargando datos del atleta...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Bloquear acceso si el pago no está al día
+  if (!paymentStatus.isUpToDate) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-6 space-y-4">
+          <div className="flex items-center justify-center mb-4">
+            <div className="rounded-full bg-destructive/10 p-3">
+              <Lock className="h-8 w-8 text-destructive" />
+            </div>
+          </div>
+          
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold text-foreground">
+              Acceso Restringido
+            </h2>
+            <p className="text-muted-foreground">
+              Tu acceso a la rutina de entrenamiento está bloqueado temporalmente.
+            </p>
+          </div>
+
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
+              <div className="space-y-1">
+                <p className="font-medium text-destructive">
+                  Pago pendiente
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {paymentStatus.message}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 space-y-2">
+            <p className="text-sm text-center text-muted-foreground">
+              Por favor, contacta a tu entrenador para regularizar tu situación de pago y recuperar el acceso a tu rutina.
+            </p>
+          </div>
+        </Card>
       </div>
     );
   }

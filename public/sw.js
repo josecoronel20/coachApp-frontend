@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coachapp-v1';
+const CACHE_NAME = 'coachapp-v2';
 const urlsToCache = [
   '/',
   '/dashboard',

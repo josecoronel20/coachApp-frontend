@@ -15,7 +15,7 @@ import { RoutineDay } from "@/types/routineType";
 import { Exercise } from "@/types/routineType";
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface FeedbackItem {
   athleteId: string;
@@ -25,43 +25,59 @@ interface FeedbackItem {
 }
 
 const FeedbackBtn = () => {
-  const { athletes } = useGetAllAthletes();
+  const { athletes, isLoading } = useGetAllAthletes();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
-  // Count the number of feedbacks
-  const feedbackCount =
-    athletes?.reduce(
-      (acc: number, athlete: Athlete) =>
-        acc +
-        (athlete.routine || []).reduce(
-          (dayAcc: number, routineDay: RoutineDay) =>
-            dayAcc +
-            (routineDay || []).reduce(
-              (exerciseAcc: number, exercise: Exercise) =>
-                exerciseAcc + (exercise.athleteNotes !== null && exercise.athleteNotes !== "" ? 1 : 0),
-              0
-            ),
-          0
-        ),
-      0
-    ) || 0;
-
   // Get the feedback list with athlete name, exercise name and feedback of the exercise
-  const feedbackList: FeedbackItem[] =
-    athletes
-      ?.flatMap((athlete: Athlete) =>
-        (athlete.routine || []).flatMap((routineDay: RoutineDay) =>
-          (routineDay || []).map((exercise: Exercise) => ({
-            athleteId: athlete.id,
-            athleteName: athlete.name,
-            exerciseName: exercise.exercise,
-            feedback: exercise.athleteNotes,
-          }))
-        )
-      )
-      .filter((item: FeedbackItem) => item.feedback !== null && item.feedback !== "") || [];
+  const feedbackList: FeedbackItem[] = useMemo(() => {
+    if (!athletes || athletes.length === 0) {
+      console.log("FeedbackBtn: No athletes or empty array");
+      return [];
+    }
 
-  console.log(feedbackList);
+    console.log("FeedbackBtn: Athletes data:", athletes);
+    console.log("FeedbackBtn: First athlete routine:", athletes[0]?.routine);
+
+    const list = athletes
+      .flatMap((athlete: Athlete) => {
+        if (!athlete.routine || athlete.routine.length === 0) {
+          return [];
+        }
+        
+        return athlete.routine.flatMap((routineDay: RoutineDay) => {
+          if (!routineDay || routineDay.length === 0) {
+            return [];
+          }
+          
+          return routineDay
+            .filter((exercise: Exercise) => {
+              const hasNotes = exercise.athleteNotes && exercise.athleteNotes.trim() !== "";
+              if (hasNotes) {
+                console.log("FeedbackBtn: Found feedback:", {
+                  athlete: athlete.name,
+                  exercise: exercise.exercise,
+                  notes: exercise.athleteNotes,
+                });
+              }
+              return hasNotes;
+            })
+            .map((exercise: Exercise) => ({
+              athleteId: athlete.id,
+              athleteName: athlete.name,
+              exerciseName: exercise.exercise,
+              feedback: exercise.athleteNotes,
+            }));
+        });
+      });
+
+    console.log("FeedbackBtn: Final feedback list:", list);
+    return list;
+  }, [athletes]);
+
+  // Count the number of feedbacks
+  const feedbackCount = useMemo(() => {
+    return feedbackList.length;
+  }, [feedbackList]);
 
   return (
     <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
@@ -83,10 +99,14 @@ const FeedbackBtn = () => {
           <DialogTitle>Feedback Reciente</DialogTitle>
         </DialogHeader>
         <div className="space-y-2 max-h-60 overflow-y-auto">
-          {feedbackList ? (
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              Cargando feedback...
+            </p>
+          ) : feedbackList.length > 0 ? (
             feedbackList.map((feedback: FeedbackItem, index: number) => (
               <div
-                key={index}
+                key={`${feedback.athleteId}-${index}`}
                 className="border p-2 rounded-md border-gray-200 pb-2 flex flex-col gap-3"
               >
                 <div className="flex flex-col gap-2">
@@ -107,7 +127,9 @@ const FeedbackBtn = () => {
               </div>
             ))
           ) : (
-            <p>No hay feedback reciente</p>
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No hay feedback reciente
+            </p>
           )}
         </div>
       </DialogContent>
