@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
 import PWAInstaller from "@/components/PWAInstaller";
 
@@ -9,18 +9,26 @@ const outfit = Outfit({
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
+const syne = Syne({
+  variable: "--font-syne",
+  subsets: ["latin"],
+  weight: ["800"],
+});
+
 export const metadata: Metadata = {
-  title: "Rutinas y progreso en un link — PWA para entrenadores",
-  description: "Plataforma PWA para entrenadores. Crea rutinas desde texto o IA, envía por WhatsApp y el atleta abre sin descargar ni registrarse. Gestión de progreso y cobros con MercadoPago.",
+  title: "Impruv — Rutinas por link y seguimiento real para coaches fitness",
+  description:
+    "Creá rutinas, compartilas con atletas sin registro y recibí pesos, reps y notas de cada sesión en un dashboard ordenado.",
   manifest: "/manifest.json",
   icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: "/favicon.ico",
+    shortcut: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Rutinas y progreso en un link — sin app, sin login",
-    description: "Crea, envía y controla rutinas. Atletas acceden por link. Feedback y progreso en tiempo real. Pagos automatizados.",
+    title: "Rutinas por link, seguimiento real y mejores decisiones",
+    description:
+      "Tus atletas entrenan desde un link. Vos recibís pesos, reps y notas sin perseguirlos por WhatsApp.",
     type: "website",
     locale: "es_ES",
   },
@@ -28,8 +36,9 @@ export const metadata: Metadata = {
     "app para entrenadores sin app",
     "rutinas por link sin login", 
     "PWA entrenadores",
-    "gestión rutinas entrenador",
-    "enviar rutina por WhatsApp"
+    "gestion rutinas entrenador",
+    "seguimiento fitness coaches",
+    "historial atletas fitness"
   ],
 };
 
@@ -42,12 +51,14 @@ export default function RootLayout({
     <html lang="es" className="dark">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#7C3AED" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="CoachApp" />
+        <meta name="apple-mobile-web-app-title" content="Impruv" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -65,7 +76,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${outfit.variable} antialiased`}
+        className={`${outfit.variable} ${syne.variable} min-h-dvh bg-bg-base text-text-primary antialiased`}
         style={{
           fontFamily: "var(--font-outfit)",
         }}

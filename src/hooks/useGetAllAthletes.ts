@@ -1,10 +1,15 @@
 import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import type { AthleteLite } from "@/types/athleteType";
+import { requireApiUrl } from "@/config/env";
 
 export const useGetAllAthletes = () => {
-  const { data, error, isLoading, mutate } = useSWR(`${API_URL}/api/coach/getAllAthletes`, fetcher);
+  const API_URL = requireApiUrl();
+  const key = `${API_URL}/api/coach/getAllAthletesLite`;
+  const { data, error, isLoading, mutate } = useSWR<AthleteLite[]>(
+    key,
+    fetcher
+  );
 
   return {
     athletes: data,

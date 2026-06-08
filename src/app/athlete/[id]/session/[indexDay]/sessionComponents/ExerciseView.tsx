@@ -1,21 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import SetCard from "./SetCard";
 import { SessionExercise } from "@/store/useAthleteSessionStore";
 import ExerciseWeight from "./ExerciseWeight";
 import AthleteNotes from "./AthleteNotes";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { updateRepsTracked } from "@/app/api/athlete";
 import { useAthleteStore } from "@/store/useAthleteStore";
-import { useParams } from "next/navigation";
+import { formatRepRangeLabel } from "@/lib/routineExercise";
+import { ExerciseMediaButton } from "@/components/exercise-media/ExerciseMediaButton";
 
 interface ExerciseDefinition {
   name: string;
   setsCount: number;
-  rangeMin?: number;
-  rangeMax?: number;
+  minReps: number;
+  maxReps: number;
   coachNotes?: string;
   athleteNotes?: string;
   weight?: number;
@@ -46,95 +43,60 @@ const ExerciseView = ({
   onSetAthleteNotes,
 }: ExerciseViewProps) => {
   const { athlete } = useAthleteStore();
-  const [repsTracked, setRepsTracked] = useState<boolean>(
-    athlete?.repsTracked || false
-  );
-  const idFromParams = useParams().id as string;
+  const repsTracked = athlete?.repsTracked ?? false;
 
   const handleSetReps = (setIndex: number, newReps: number) => {
     onSetReps(setIndex, newReps);
   };
 
-  const handleSetRepsTracked = async () => {
-    const response = await updateRepsTracked(idFromParams, !repsTracked);
-    if (response.status === 200) {
-      setRepsTracked(!repsTracked);
-    }
-  };
-
-  const recommendations = [
-    `Tu objetivo es mantenerte entre ${exerciseDefinition.rangeMin} y ${exerciseDefinition.rangeMax} repeticiones; si no alcanzás el mínimo reducí el peso, y si superás el máximo aumentalo, siempre priorizando la técnica.`,
-    `Cada semana anotá las repeticiones que logres en cada serie con el peso actual. El objetivo es ir sumando repeticiones progresivamente en todas las series hasta llegar a ${exerciseDefinition.rangeMax} reps. Cuando alcances ese número, aumentá el peso y volvés a trabajar desde ${exerciseDefinition.rangeMin} reps.`,
-  ];
+  const repRangeLabel = formatRepRangeLabel(exerciseDefinition);
+  
 
   return (
     <div className="space-y-4 p-4">
-      {/* Título del ejercicio */}
 
-      <div className="flex justify-between items-center gap-2">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
+      {/* Nombre del ejercicio */}
+      <div>
+        <div className="flex items-start gap-2">
+          <h1 className="text-2xl font-bold text-text-primary leading-tight">
             {exerciseDefinition.name}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {exerciseDefinition.setsCount} series de{" "}
-            {exerciseDefinition.rangeMin} a {exerciseDefinition.rangeMax} reps
+          <ExerciseMediaButton key={exerciseDefinition.name} exerciseName={exerciseDefinition.name} />
+        </div>
+        {repsTracked && (
+          <p className="mt-1 text-sm text-text-muted">
+            Objetivo: <span className="text-text-secondary font-medium">
+              {exerciseDefinition.minReps}–{exerciseDefinition.maxReps} reps
+            </span>
           </p>
-        </div>
-
-        {/* Toggle para modo de registro */}
-        <div className="flex items-center gap-3 p-2 rounded-lg cursor-pointer  ">
-          <Switch
-            id="repsTracked"
-            checked={repsTracked}
-            onCheckedChange={handleSetRepsTracked}
-            className="data-[state=checked]:bg-primary"
-          />
-          <Label
-            htmlFor="repsTracked"
-            className="text-xs"
-          >
-            {repsTracked
-              ? "Modo detallado"
-              : "Modo simple"}
-          </Label>
-        </div>
+        )}
       </div>
 
-      <details className="w-full flex flex-col  rounded-lg p-2 cursor-pointer">
-        <summary className="text-sm text-foreground">
-          Como progresar en el ejercicio?
-        </summary>
-        <p className="text-sm text-muted-foreground">
-          {repsTracked ? recommendations[1] : recommendations[0]}
-        </p>
-      </details>
-
+      {/* Peso + referencia última sesión */}
       <div
         className={`${
           repsTracked && exerciseDefinition.lastHistory
-            ? "grid grid-cols-2 items-center gap-2"
-            : "grid grid-cols-1 items-center gap-2"
+            ? "grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2"
+            : "grid grid-cols-1 gap-3"
         }`}
       >
-        {/* Información de última sesión (solo referencia visual) */}
+        {/* Referencia última sesión */}
         {exerciseDefinition.lastHistory && repsTracked && (
-          <div className=" p-4 bg-muted rounded-lg col-span-1">
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">
-              Última sesión (referencia)
-            </h4>
-            <div className="flex flex-col text-sm text-muted-foreground">
-              <p>
+          <div className="rounded-app-xl border border-border-subtle bg-bg-surface-1 p-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-muted">
+              Última sesión
+            </p>
+            <div className="flex flex-col gap-1 text-sm">
+              <p className="text-text-secondary">
                 Peso:{" "}
-                <span className="font-semibold text-foreground">
+                <span className="font-semibold text-text-primary">
                   {exerciseDefinition.lastHistory.weight} kg
                 </span>
               </p>
-
-              <p>
+              <p className="text-text-secondary">
                 Reps:{" "}
-                <span className="font-semibold text-foreground">
-                  {exerciseDefinition.lastHistory.sets.join(" - ")}
+                <span className="font-semibold text-text-primary">
+                  {exerciseDefinition.lastHistory.sets.join(" · ")}
                 </span>
               </p>
             </div>
@@ -144,27 +106,32 @@ const ExerciseView = ({
         {/* Campo de peso */}
         <ExerciseWeight
           weight={
-            sessionExercise.weight ||
-            exerciseDefinition.lastHistory?.weight ||
+            sessionExercise.weight ??
+            exerciseDefinition.lastHistory?.weight ??
             0
           }
           onWeightChange={onSetWeight}
         />
       </div>
 
+      {/* Nota del entrenador */}
       {exerciseDefinition.coachNotes && (
-        <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">
-            Nota del entrenador:
-          </span>{" "}
-          {exerciseDefinition.coachNotes}
-        </p>
+        <div className="rounded-app-xl border border-border-subtle bg-bg-surface-1 p-3">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-text-muted">
+            Nota del entrenador
+          </p>
+          <p className="text-sm text-text-secondary">
+            {exerciseDefinition.coachNotes}
+          </p>
+        </div>
       )}
 
-      {/* Sets y reps */}
+      {/* Series y reps */}
       {repsTracked ? (
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Series y Repeticiones</h3>
+          <p className="text-sm font-semibold text-text-secondary">
+            Series y repeticiones
+          </p>
           <div className="space-y-2">
             {sessionExercise.sets.map((reps, setIndex) => (
               <SetCard
@@ -172,19 +139,34 @@ const ExerciseView = ({
                 value={reps}
                 onInc={() => handleSetReps(setIndex, reps + 1)}
                 onDec={() => handleSetReps(setIndex, reps - 1)}
-                min={exerciseDefinition.rangeMin || 0}
-                max={exerciseDefinition.rangeMax || 20}
+                min={-99999}
+                max={99999}
                 label={`Serie ${setIndex + 1}`}
+                minReps={exerciseDefinition.minReps}
+                maxReps={exerciseDefinition.maxReps}
               />
             ))}
           </div>
+
+          {/* Aviso: listo para subir carga */}
+          {sessionExercise.sets.length > 0 &&
+            sessionExercise.sets.every(
+              (r) => r >= exerciseDefinition.maxReps
+            ) && (
+              <div className="flex items-center gap-2 rounded-app-xl border border-success/30 bg-success/10 px-4 py-3">
+                <span className="text-lg">🏋️</span>
+                <p className="text-sm font-semibold text-success">
+                  ¡Subí el peso! Volvé a {exerciseDefinition.minReps} reps
+                </p>
+              </div>
+            )}
         </div>
       ) : (
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold">
-            Intentá realizar entre {exerciseDefinition.rangeMin} y{" "}
-            {exerciseDefinition.rangeMax} repeticiones cada serie
-          </h3>
+        <div className="rounded-app-xl border border-border-subtle bg-bg-surface-1 p-4">
+          <p className="text-sm text-text-secondary">
+            Objetivo de reps:{" "}
+            <span className="font-semibold text-text-primary">{repRangeLabel}</span>
+          </p>
         </div>
       )}
 

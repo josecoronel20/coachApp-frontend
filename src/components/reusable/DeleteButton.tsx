@@ -16,7 +16,7 @@ export const DeleteButton = ({
   handleDelete,
   label,
 }: {
-  handleDelete: () => void;
+  handleDelete: () => void | Promise<void>;
   label: "ejercicio" | "día" | "atleta";
 }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -26,8 +26,12 @@ export const DeleteButton = ({
     <>
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogTrigger asChild>
-          <Button size="sm" className={`hover:bg-destructive/50 bg-destructive/0 ${label !== "ejercicio" ? "w-full" : ""}`} >
-            <Trash2 className="h-4 w-4" />
+          <Button
+            size={label === "ejercicio" ? "icon" : "sm"}
+            variant={label === "ejercicio" ? "ghost" : "danger"}
+            className={`${label === "ejercicio" ? "size-8 rounded-app-full text-danger hover:text-danger" : "w-full rounded-app-full"}`}
+          >
+            <Trash2 className="size-4" />
             {label !== "ejercicio" && <span className="text-sm">Eliminar este {label}</span>}
           </Button>
         </DialogTrigger>
@@ -48,9 +52,14 @@ export const DeleteButton = ({
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                handleDelete();
-                setIsDeleteDialogOpen(false);
+              onClick={async () => {
+                try {
+                  setIsDeleting(true);
+                  await handleDelete();
+                } finally {
+                  setIsDeleting(false);
+                  setIsDeleteDialogOpen(false);
+                }
               }}
               disabled={isDeleting}
             >

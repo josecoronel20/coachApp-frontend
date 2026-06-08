@@ -4,12 +4,18 @@ import { useState, useMemo } from "react";
 import { Edit, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { StatusBanner } from "@/components/ui/status-banner";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { updateRepsTracked } from "@/app/api/athlete";
 import { updateAthleteBasicInfo } from "@/app/api/protected";
+import { getApiErrorMessage } from "@/lib/apiError";
 import type { Athlete } from "@/types/athleteType";
 
 interface AthleteInfoCardProps {
   athlete: Athlete;
+  onRepsTrackedSaved?: () => Promise<void> | void;
 }
 
 const INITIALIZE_FORM = (athlete: Athlete) => ({
@@ -20,9 +26,10 @@ const INITIALIZE_FORM = (athlete: Athlete) => ({
   notes: athlete.notes || "",
 });
 
-const AthleteInfoCard = ({ athlete }: AthleteInfoCardProps) => {
+const AthleteInfoCard = ({ athlete, onRepsTrackedSaved }: AthleteInfoCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState(() => INITIALIZE_FORM(athlete));
+  const [repsTracked, setRepsTracked] = useState(athlete.repsTracked);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -53,6 +60,28 @@ const AthleteInfoCard = ({ athlete }: AthleteInfoCardProps) => {
     setIsEditing(false);
   };
 
+  const handleRepsTrackedChange = async (checked: boolean) => {
+    const previous = repsTracked;
+    setRepsTracked(checked);
+    setError(null);
+
+    try {
+      const response = await updateRepsTracked(athlete.id, checked);
+      if (!response.ok) {
+        setRepsTracked(previous);
+        setError(
+          await getApiErrorMessage(response, "No se pudo actualizar el modo detallado")
+        );
+        return;
+      }
+
+      await onRepsTrackedSaved?.();
+    } catch {
+      setRepsTracked(previous);
+      setError("Error de red al actualizar el modo detallado");
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -68,8 +97,7 @@ const AthleteInfoCard = ({ athlete }: AthleteInfoCardProps) => {
       if (resp.ok) {
         setIsEditing(false);
       } else {
-        const data = await resp.json();
-        setError(data?.message || "No se pudo actualizar");
+        setError(await getApiErrorMessage(resp, "No se pudo actualizar"));
       }
     } catch {
       setError("Error de red o del servidor");
@@ -79,51 +107,70 @@ const AthleteInfoCard = ({ athlete }: AthleteInfoCardProps) => {
   };
 
   return (
-    <section className="rounded-xl border border-border bg-card px-6 py-5 shadow-sm w-full">
+    <section className="w-full rounded-app-2xl border border-border-subtle bg-bg-surface-1 px-6 py-5 shadow-elevation-2">
       <header className="mb-4 flex items-center justify-between">
-        <h3 className="text-base font-semibold text-foreground tracking-tight">Información personal</h3>
+        <h3 className="text-base font-bold tracking-tight text-text-primary">Informacion personal</h3>
         {!isEditing && (
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
-            aria-label="Editar información del atleta"
+            aria-label="Editar informacion del atleta"
             onClick={() => setIsEditing(true)}
-            className="border border-border text-muted-foreground hover:text-primary"
+            className="rounded-app-xl"
           >
-            <Edit className="h-5 w-5" />
+            <Edit className="size-5" />
           </Button>
         )}
       </header>
 
       {!isEditing ? (
-        <dl className="grid gap-y-2 text-sm text-muted-foreground">
+        <dl className="grid gap-y-3 text-sm text-text-secondary">
           <div className="flex flex-col gap-0.5">
-            <dt className="text-xs font-medium text-muted-foreground/70">Nombre</dt>
-            <dd className="text-foreground">{athlete.name}</dd>
+            <dt className="text-xs font-medium text-text-muted">Nombre</dt>
+            <dd className="text-text-primary">{athlete.name}</dd>
           </div>
           <div className="flex flex-col gap-0.5">
-            <dt className="text-xs font-medium text-muted-foreground/70">Email</dt>
-            <dd className="text-foreground">{athlete.email || <span className="italic text-muted-foreground">No disponible</span>}</dd>
+            <dt className="text-xs font-medium text-text-muted">Email</dt>
+            <dd className="text-text-primary">{athlete.email || <span className="italic text-text-muted">No disponible</span>}</dd>
           </div>
           <div className="flex flex-col gap-0.5">
-            <dt className="text-xs font-medium text-muted-foreground/70">Teléfono</dt>
-            <dd className="text-foreground">{athlete.phone || <span className="italic text-muted-foreground">No disponible</span>}</dd>
+            <dt className="text-xs font-medium text-text-muted">Telefono</dt>
+            <dd className="text-text-primary">{athlete.phone || <span className="italic text-text-muted">No disponible</span>}</dd>
           </div>
           <div className="flex flex-col gap-0.5">
-            <dt className="text-xs font-medium text-muted-foreground/70">Peso corporal</dt>
-            <dd className="text-foreground">{athlete.bodyWeight ? `${athlete.bodyWeight} kg` : <span className="italic text-muted-foreground">No registrado</span>}</dd>
+            <dt className="text-xs font-medium text-text-muted">Peso corporal</dt>
+            <dd className="text-text-primary">{athlete.bodyWeight ? `${athlete.bodyWeight} kg` : <span className="italic text-text-muted">No registrado</span>}</dd>
           </div>
           <div className="flex flex-col gap-0.5">
-            <dt className="text-xs font-medium text-muted-foreground/70">Observaciones</dt>
-            <dd className="text-foreground">{athlete.notes || <span className="italic text-muted-foreground">No registradas</span>}</dd>
+            <dt className="text-xs font-medium text-text-muted">Observaciones</dt>
+            <dd className="text-text-primary">{athlete.notes || <span className="italic text-text-muted">No registradas</span>}</dd>
           </div>
           <div className="flex flex-col gap-0.5 mt-2">
-            <dt className="text-xs font-medium text-muted-foreground/70">Notas del atleta</dt>
-            <dd className={notesToReview ? "font-semibold text-destructive" : "font-medium text-primary"}>
+            <dt className="text-xs font-medium text-text-muted">Notas del atleta</dt>
+            <dd className={notesToReview ? "font-semibold text-warning" : "font-medium text-purple-soft"}>
               {notesToReview
-                ? `Hay ${notesToReview} nota${notesToReview > 1 ? "s" : ""} pendiente${notesToReview > 1 ? "s" : ""} de revisión`
+                ? `Hay ${notesToReview} nota${notesToReview > 1 ? "s" : ""} pendiente${notesToReview > 1 ? "s" : ""} de revision`
                 : "No hay notas pendientes"}
             </dd>
+          </div>
+          <div className="mt-2 flex items-center justify-between gap-3 rounded-app-xl border border-border-subtle bg-bg-surface-2 p-3">
+            <div className="space-y-0.5">
+              <dt className="text-xs font-medium text-text-muted">Modo de registro</dt>
+              <dd className="text-sm text-text-primary">
+                {repsTracked ? "Detallado por serie" : "Simple"}
+              </dd>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="coach-reps-tracked"
+                checked={repsTracked}
+                onCheckedChange={handleRepsTrackedChange}
+                className="data-[state=checked]:bg-primary"
+              />
+              <Label htmlFor="coach-reps-tracked" className="text-xs text-text-secondary">
+                Detallado
+              </Label>
+            </div>
           </div>
         </dl>
       ) : (
@@ -181,7 +228,7 @@ const AthleteInfoCard = ({ athlete }: AthleteInfoCardProps) => {
             />
           </div>
           {error && (
-            <p className="rounded bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">{error}</p>
+            <StatusBanner variant="danger" message={error} />
           )}
 
           <div className="flex gap-2 justify-end pt-1">

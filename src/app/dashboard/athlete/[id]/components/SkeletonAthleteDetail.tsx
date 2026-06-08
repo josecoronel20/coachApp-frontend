@@ -6,8 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton";
  */
 const SkeletonAthleteDetail = () => {
   return (
-    <div className="min-h-screen bg-muted pt-16">
-      <div className="border-b border-border bg-card p-4 shadow-sm">
+    <div className="min-h-dvh bg-bg-base pt-16 text-text-primary">
+      <div className="border-b border-border-subtle bg-bg-surface-1 p-4 shadow-elevation-1">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Skeleton className="h-9 w-32" />
           <Skeleton className="h-9 w-40" />

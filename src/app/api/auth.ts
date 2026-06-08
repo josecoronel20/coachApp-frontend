@@ -1,16 +1,17 @@
 import { CredentialsLogin, CredentialsRegister } from "@/types/authType";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { requireApiUrl } from "@/config/env";
 
 export const registerUser = async ({
   email,
   password,
   name,
   confirmPassword,
-}: CredentialsRegister) => {
+  inviteToken,
+}: CredentialsRegister & { inviteToken?: string }) => {
+  const API_URL = requireApiUrl();
   const response = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
-    body: JSON.stringify({ email, password, name, confirmPassword }),
+    body: JSON.stringify({ email, password, name, confirmPassword, inviteToken }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -21,6 +22,7 @@ export const registerUser = async ({
 };
 
 export const loginUser = async ({ email, password }: CredentialsLogin) => {
+  const API_URL = requireApiUrl();
   const response = await fetch(
     `${API_URL}/api/auth/login`,
     {
@@ -37,6 +39,7 @@ export const loginUser = async ({ email, password }: CredentialsLogin) => {
 };
 
 export const logoutUser = async () => {
+  const API_URL = requireApiUrl();
   const response = await fetch(`${API_URL}/api/auth/logout`, {
     method: "POST",
     credentials: "include",
@@ -46,6 +49,7 @@ export const logoutUser = async () => {
 };
 
 export const isAuthenticated = async () => {
+  const API_URL = requireApiUrl();
   const response = await fetch(`${API_URL}/api/auth/isAuthenticated`, {
     method: "GET",
     credentials: "include",

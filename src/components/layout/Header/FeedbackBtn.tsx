@@ -9,13 +9,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
-import { Athlete } from "@/types/athleteType";
+import { useGetAllAthletesWithRoutine } from "@/hooks/useGetAllAthletesWithRoutine";
+import type { Athlete } from "@/types/athleteType";
 import { RoutineDay } from "@/types/routineType";
 import { Exercise } from "@/types/routineType";
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface FeedbackItem {
   athleteId: string;
@@ -25,40 +25,33 @@ interface FeedbackItem {
 }
 
 const FeedbackBtn = () => {
-  const { athletes, isLoading } = useGetAllAthletes();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const { athletes, isLoading } = useGetAllAthletesWithRoutine(true);
+  const [cachedFeedbackList, setCachedFeedbackList] = useState<FeedbackItem[]>(
+    []
+  );
 
   // Get the feedback list with athlete name, exercise name and feedback of the exercise
   const feedbackList: FeedbackItem[] = useMemo(() => {
     if (!athletes || athletes.length === 0) {
-      console.log("FeedbackBtn: No athletes or empty array");
       return [];
     }
-
-    console.log("FeedbackBtn: Athletes data:", athletes);
-    console.log("FeedbackBtn: First athlete routine:", athletes[0]?.routine);
 
     const list = athletes
       .flatMap((athlete: Athlete) => {
         if (!athlete.routine || athlete.routine.length === 0) {
           return [];
         }
-        
+
         return athlete.routine.flatMap((routineDay: RoutineDay) => {
           if (!routineDay || routineDay.length === 0) {
             return [];
           }
-          
+
           return routineDay
             .filter((exercise: Exercise) => {
-              const hasNotes = exercise.athleteNotes && exercise.athleteNotes.trim() !== "";
-              if (hasNotes) {
-                console.log("FeedbackBtn: Found feedback:", {
-                  athlete: athlete.name,
-                  exercise: exercise.exercise,
-                  notes: exercise.athleteNotes,
-                });
-              }
+              const hasNotes =
+                exercise.athleteNotes && exercise.athleteNotes.trim() !== "";
               return hasNotes;
             })
             .map((exercise: Exercise) => ({
@@ -70,14 +63,21 @@ const FeedbackBtn = () => {
         });
       });
 
-    console.log("FeedbackBtn: Final feedback list:", list);
     return list;
   }, [athletes]);
 
+  useEffect(() => {
+    if (athletes) {
+      setCachedFeedbackList(feedbackList);
+    }
+  }, [athletes, feedbackList]);
+
+  const visibleFeedbackList = athletes ? feedbackList : cachedFeedbackList;
+
   // Count the number of feedbacks
   const feedbackCount = useMemo(() => {
-    return feedbackList.length;
-  }, [feedbackList]);
+    return visibleFeedbackList.length;
+  }, [visibleFeedbackList]);
 
   return (
     <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
@@ -103,8 +103,8 @@ const FeedbackBtn = () => {
             <p className="text-sm text-muted-foreground text-center py-4">
               Cargando feedback...
             </p>
-          ) : feedbackList.length > 0 ? (
-            feedbackList.map((feedback: FeedbackItem, index: number) => (
+          ) : visibleFeedbackList.length > 0 ? (
+            visibleFeedbackList.map((feedback: FeedbackItem, index: number) => (
               <div
                 key={`${feedback.athleteId}-${index}`}
                 className="border p-2 rounded-md border-gray-200 pb-2 flex flex-col gap-3"

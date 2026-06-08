@@ -1,8 +1,6 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import type { ChangeEvent } from "react";
+import { SearchInput as BaseSearchInput } from "@/components/ui/search-input";
 
 interface SearchInputProps {
   /** Texto actual del campo de búsqueda */
@@ -16,17 +14,12 @@ interface SearchInputProps {
 /**
  * Campo de búsqueda con icono usado en el dashboard para filtrar atletas.
  */
-const SearchInput = ({ value, onChange, placeholder = "Buscar" }: SearchInputProps) => {
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
-  };
-
-  return (
-    <label className="flex items-center gap-2">
-      <Search className="size-4 text-muted-foreground" />
-      <Input value={value} onChange={handleChange} placeholder={placeholder} />
-    </label>
-  );
-};
+const SearchInput = ({ value, onChange, placeholder = "Buscar" }: SearchInputProps) => (
+  <BaseSearchInput
+    value={value}
+    onValueChange={onChange}
+    placeholder={placeholder}
+  />
+);
 
 export default SearchInput;

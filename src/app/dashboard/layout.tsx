@@ -1,28 +1,31 @@
 import type { Metadata } from "next";
 import Header from "@/components/layout/Header/Header";
+import AuthGate from "@/components/auth/AuthGate";
+import DashboardBottomNav from "./dashboardComponents/DashboardBottomNav";
+import CoachPWAInstallPrompt from "./dashboardComponents/CoachPWAInstallPrompt";
 
 export const metadata: Metadata = {
-  title: "Dashboard - GymBro Coach",
-  description: "Dashboard - GymBro Coach",
+  title: "Dashboard - Impruv",
+  description: "Dashboard para coaches fitness: atletas, rutinas por link y seguimiento real.",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Dashboard - GymBro Coach",
-    description: "Dashboard - GymBro Coach",
+    title: "Dashboard - Impruv",
+    description: "Dashboard para coaches fitness: atletas, rutinas por link y seguimiento real.",
     type: "website",
     locale: "es_ES",
   },
   keywords: [
     "dashboard",
-    "GymBro Coach",
+    "Impruv",
     "entrenador",
     "rutina",
     "progreso",
-    "cobros",
-    "MercadoPago",
+    "seguimiento atletas",
+    "rutinas por link",
   ],
 };
 
@@ -34,9 +37,13 @@ export default function RootLayout({
 
 
   return (
-    <>
-      <Header/>
-      {children}
-    </>
+    <AuthGate mode="require-auth">
+      <div className="app-shell py-16">
+        <Header />
+        <CoachPWAInstallPrompt />
+        {children}
+        <DashboardBottomNav />
+      </div>
+    </AuthGate>
   );
 }

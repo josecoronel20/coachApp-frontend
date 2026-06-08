@@ -1,55 +1,54 @@
-const CACHE_NAME = 'coachapp-v2';
+const CACHE_NAME = "impruv-coach-v1";
+
 const urlsToCache = [
-  '/',
-  '/dashboard',
-  '/auth/login',
-  '/auth/register',
-  '/logo.png',
-  '/manifest.json'
+  "/",
+  "/auth/login",
+  "/manifest.json",
+  "/favicon.ico",
+  "/favicon.png",
+  "/apple-touch-icon.png",
+  "/pwa-96.png",
+  "/pwa-192.png",
+  "/pwa-512.png",
+  "/pwa-maskable-192.png",
+  "/pwa-maskable-512.png",
 ];
 
-// Install event
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+self.addEventListener("install", (event) => {
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)));
 });
 
-// Fetch event
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  
-  // Don't intercept API requests - let them go directly to the network
-  if (url.pathname.startsWith('/api/') || url.hostname.includes('onrender.com') || url.hostname.includes('vercel.app')) {
-    return; // Let the browser handle the request normally
-  }
-  
+/**
+ * Cache conservador para GET same-origin.
+ * No intercepta API, assets de Next ni datos privados del coach.
+ */
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  if (req.method !== "GET") return;
+
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith("/api/")) return;
+  if (url.pathname.startsWith("/_next/")) return;
+  if (url.pathname === "/sw.js") return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      }
-    )
+    caches.match(req).then((cached) => cached || fetch(req)).catch(() => {
+      if (req.mode === "navigate") return caches.match("/");
+      return Response.error();
+    })
   );
 });
 
-// Activate event
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+    caches.keys().then((cacheNames) =>
+      Promise.all(
+        cacheNames.map((name) => {
+          if (name !== CACHE_NAME) return caches.delete(name);
+          return undefined;
         })
-      );
-    })
+      )
+    )
   );
 });

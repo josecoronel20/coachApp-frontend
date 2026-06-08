@@ -1,20 +1,19 @@
-import { useAthleteStore } from "@/store/useAthleteStore";
-import { Athlete } from "@/types/athleteType";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { getApiErrorMessage } from "@/lib/apiError"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const fetcher = (url: string) => 
-  fetch(url, { credentials: "include" })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      return res.json();
-    });
+export const fetcher = (url: string) =>
+  fetch(url, { credentials: "include" }).then(async (res) => {
+    if (!res.ok) {
+      const message = await getApiErrorMessage(res);
+      throw new Error(message);
+    }
+    return res.json();
+  });
 
 
 //seteo de info de atleta en local storage y en el store

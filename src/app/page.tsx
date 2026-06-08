@@ -1,467 +1,495 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Smartphone,
-  Zap,
-  BarChart3,
-  MessageCircle,
-  CreditCard,
-  Clock,
-  CheckCircle,
-  TrendingUp,
-  ArrowRight,
-} from "lucide-react";
-import Link from "next/link";
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import {
+  BarChart3,
+  CheckCircle2,
+  ClipboardList,
+  Link2,
+  MessageCircle,
+  ShieldCheck,
+  Smartphone,
+  X,
+} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/ui/reveal";
+import { ImpruVLogo } from "@/components/brand/ImpruVLogo";
+import { ImpruVWordmark } from "@/components/brand/ImpruVWordmark";
+import { LandingBadge } from "@/components/landing/landing-badge";
+import { Section, SectionHeader } from "@/components/landing/section";
+import { FeatureCard } from "@/components/landing/feature-card";
+import { HeroProof } from "@/components/landing/hero-proof";
+import { ProofCard } from "@/components/landing/proof-card";
+import { ProblemItem } from "@/components/landing/problem-item";
+import { CtaForm } from "@/components/landing/cta-form";
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const navItems = [
+  { label: "Como funciona", href: "#como-funciona" },
+  { label: "Diferencial", href: "#diferencial" },
+  { label: "Para quien", href: "#para-quien" },
+];
+
+const problemCards = [
+  {
+    icon: MessageCircle,
+    title: '"Cuanto levantaste la semana pasada?"',
+    text: "Le preguntas por WhatsApp. Tu atleta busca entre mensajes, responde tarde o directamente no responde. Terminas decidiendo la progresion con informacion incompleta.",
+  },
+  {
+    icon: BarChart3,
+    title: "Un Excel por atleta",
+    text: "Rutinas en archivos distintos, formatos distintos, versiones distintas. A veces ni sabes cual fue el ultimo cambio que mandaste.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Rutinas como PDF o imagen",
+    text: "El atleta la guarda en el telefono, despues no la encuentra, te pide que se la mandes de nuevo y volves a buscar entre chats.",
+  },
+];
+
+const steps = [
+  {
+    number: "1",
+    title: "Creas la rutina",
+    text: "Organizas dias, ejercicios, series y rangos de repeticiones desde tu dashboard.",
+  },
+  {
+    number: "2",
+    title: "Compartis un link",
+    text: "Generas un link unico para ese atleta y se lo mandas por WhatsApp, Instagram o donde ya hablen normalmente.",
+  },
+  {
+    number: "3",
+    title: "Tu atleta entrena desde el celular",
+    text: "Abre el link, ve su rutina y registra cada serie: peso, reps y notas.",
+  },
+  {
+    number: "4",
+    title: "Recibis la sesion en tu dashboard",
+    text: "Ves los datos cargados sin pedir capturas, audios ni mensajes sueltos.",
+  },
+];
+
+const comparisonRows = [
+  ["El atleta necesita descargar una app", "No", "Muchas veces si"],
+  ["El atleta necesita crear una cuenta", "No", "Muchas veces si"],
+  ["Puede cargar pesos, reps y notas", "Si", "Si"],
+  ["El coach recibe la sesion ordenada", "Si", "Si"],
+  ["Esta pensado para una beta simple y rapida", "Si", "No siempre"],
+];
+
+const isFor = [
+  "Ya tenes atletas pagando y hoy gestionas rutinas, seguimiento y feedback entre WhatsApp, Excel o PDFs.",
+  "Queres dar una experiencia mas profesional sin obligar a tu atleta a descargar otra app o crear otra cuenta.",
+  "Estas creciendo y sentis que tu sistema actual empieza a quedar chico.",
+];
+
+const isNotFor = [
+  "Buscas gestion de dietas, agenda integrada o videollamadas. Eso no esta en esta beta, pero si en el futuro.",
+  "Todos tus atletas son presenciales y no necesitas registrar sesiones de forma digital.",
+  "Ya usas una herramienta que funciona bien y tus atletas la adoptan sin friccion.",
+];
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={32}
-                height={32}
-                className="object-contain"
-              />
-              <span className="text-xl font-bold text-gray-900">
-                GymBro Coach
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/auth/login"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Iniciar sesión
-              </Link>
-              <Button asChild>
-                <Link href="/auth/register">Crear cuenta</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <main className="min-h-dvh overflow-hidden bg-bg-base text-text-primary">
+      <LandingHeader />
+      <HeroSection />
+      <div className="mx-auto w-full max-w-[1200px] px-5 pb-20 sm:px-8 lg:pb-28">
+        <ProblemSection />
+        <HowItWorksSection />
+        <DifferentialSection />
+        <AudienceSection />
+        <BuildSection />
+        <FinalCtaSection />
+      </div>
+      <LandingFooter />
+    </main>
+  );
+}
 
-      {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Rutinas y progreso en un link —{" "}
-            <span className="text-blue-600">sin app, sin login</span>
-          </h1> 
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Crea rutinas desde texto o IA. Envía por WhatsApp. Atletas abren y
-            entrenan sin descargar nada.
+// ─── Sections ─────────────────────────────────────────────────────────────────
+
+function LandingHeader() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base/88 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5 sm:px-8">
+        <Link href="/" aria-label="Impruv" className="flex items-center">
+          <span className="block sm:hidden">
+            <ImpruVLogo size={30} color="#A855F7" />
+          </span>
+          <span className="hidden sm:block">
+            <ImpruVWordmark size="sm" color="#F8FAFC" />
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-7 md:flex">
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="text-sm font-medium text-text-secondary transition hover:text-text-primary"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <Button
+          asChild
+          className="rounded-app-full bg-purple-primary px-5 text-white shadow-purple-glow hover:bg-purple-bright"
+        >
+          <Link href="/beta">Quiero acceso a la beta</Link>
+        </Button>
+      </div>
+    </header>
+  );
+}
+
+function HeroSection() {
+  return (
+    <section className="relative min-h-[calc(100dvh-4rem)] overflow-hidden border-b border-border-subtle">
+      <Image
+        src="/logo.png"
+        alt=""
+        width={900}
+        height={900}
+        priority
+        className="pointer-events-none absolute right-[-260px] top-8 hidden w-[760px] max-w-none opacity-20 blur-[1px] lg:block"
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,12,0.72)_0%,rgba(8,8,12,0.94)_72%,rgba(8,8,12,1)_100%)]" />
+      <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,rgba(124,58,237,0.24),transparent_64%)]" />
+
+      <div className="relative mx-auto grid min-h-[calc(100dvh-4rem)] max-w-[1200px] content-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:py-16">
+        <div className="max-w-3xl">
+          <LandingBadge>Beta gratuita · Primeros coaches</LandingBadge>
+          <h1 className="mt-6 max-w-4xl text-balance text-4xl font-extrabold leading-tight text-text-primary sm:text-6xl lg:text-[64px]">
+            Tus atletas entrenan desde un link.
+            <span className="block text-purple-soft">
+              Vos recibis pesos, reps y notas.
+            </span>
+          </h1>
+          <p className="mt-6 max-w-2xl text-base leading-8 text-text-secondary sm:text-lg">
+            Creas la rutina, generas un link y se lo mandas. Tu atleta lo abre
+            desde el celular, sin descargar nada y sin registrarse. Carga
+            pesos, reps y notas; vos recibis la sesion en tu dashboard.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="text-lg px-8 py-4" asChild>
-              <Link href="/auth/register">
-                Crear cuenta
-                <ArrowRight className="ml-2 h-5 w-5" />
+
+          <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
+            <HeroProof icon={Link2} text="Solo link" />
+            <HeroProof icon={Smartphone} text="Sin app" />
+            <HeroProof icon={ShieldCheck} text="Sin registro" />
+          </div>
+
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Button
+              size="lg"
+              asChild
+              className="h-12 rounded-app-full bg-purple-primary px-7 text-white shadow-purple-glow hover:bg-purple-bright"
+            >
+              <Link href="/beta">
+                Quiero acceso a la beta
+                <ArrowRight className="size-5" />
               </Link>
             </Button>
+            <a
+              href="#conversacion"
+              className="text-sm text-text-secondary underline-offset-4 transition hover:text-text-primary hover:underline"
+            >
+              Prefiero contar como trabajo hoy
+            </a>
           </div>
-          <p className="text-sm text-gray-500 mt-4">
-            Plan base: hasta 5 atletas por entrenador.
+
+          <p className="mt-4 text-xs font-medium text-text-muted">
+            Beta gratuita · Sin tarjeta de credito · Cupos limitados para
+            primeros coaches.
           </p>
         </div>
-      </section>
 
-      {/* Valor Clave */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div className="flex flex-col items-center">
-              <Zap className="h-12 w-12 text-blue-600 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900">
-                Acceso inmediato por link
-              </h3>
-            </div>
-            <div className="flex flex-col items-center">
-              <Smartphone className="h-12 w-12 text-blue-600 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900">
-                Ejecución click-only para atletas
-              </h3>
-            </div>
-            <div className="flex flex-col items-center">
-              <BarChart3 className="h-12 w-12 text-blue-600 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900">
-                Control y métricas para entrenadores
-              </h3>
-            </div>
-          </div>
+        <div className="relative self-center lg:pl-4">
+          <div className="pointer-events-none absolute -inset-10 -z-10 rounded-full bg-purple-primary/20 blur-3xl" />
+          <Image
+            src="/mockup_atleta_navegador_transparente.png"
+            alt="Vista del atleta entrenando desde un link en el navegador"
+            width={1086}
+            height={1448}
+            priority
+            sizes="(min-width: 1024px) 470px, (min-width: 640px) 420px, 92vw"
+            className="h-auto w-full rounded-[24px]"
+          />
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* Características Principales */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Todo lo que un entrenador necesita para gestionar rutinas y
-              progreso sin fricción
+function ProblemSection() {
+  return (
+    <Reveal>
+      <Section>
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.25fr] lg:gap-20 lg:items-start">
+          <div className="max-w-md">
+            <h2 className="text-balance text-3xl font-extrabold leading-tight text-text-primary sm:text-5xl">
+              Gestionar atletas no deberia depender de WhatsApp, Excel y PDFs
             </h2>
+            <p className="mt-5 text-base leading-8 text-text-secondary">
+              Cuando tenes pocos atletas, lo podes manejar a mano. Pero cuando
+              empezas a crecer, el sistema se vuelve dificil de sostener.
+            </p>
+            <p className="mt-4 text-base text-text-muted">
+              Todo eso te quita tiempo, te desordena y hace mas dificil
+              acompanar bien a cada atleta.
+            </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <Clock className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Creación ultra rápida
-                </h3>
-                <p className="text-gray-600">
-                  Pega texto o usa IA. Preview antes de guardar.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <Smartphone className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Vista atleta sin fricción
-                </h3>
-                <p className="text-gray-600">
-                  PWA móvil. No login. No instalación. Inicia en un tap.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <TrendingUp className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Edición por atleta
-                </h3>
-                <p className="text-gray-600">
-                  Ajuste de peso y reps. Progresión automática.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <MessageCircle className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Feedback por ejercicio
-                </h3>
-                <p className="text-gray-600">
-                  Botones predefinidos y comentarios guardados.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <BarChart3 className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Historial semanal
-                </h3>
-                <p className="text-gray-600">
-                  Reps y peso por semana por ejercicio.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <CreditCard className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Pagos automáticos
-                </h3>
-                <p className="text-gray-600">
-                  MercadoPago: alias y monto preconfigurado por atleta.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
-      {/* Cómo Funciona */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Tres pasos para llevar rutinas al atleta
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-6">
-                1
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Crear</h3>
-              <p className="text-gray-600">
-                Pegar la rutina o generar con IA. Ver preview. Confirmar.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-6">
-                2
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Enviar</h3>
-              <p className="text-gray-600">
-                Pulsar &quot;Enviar por WhatsApp&quot;. Se crea link seguro.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-6">
-                3
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Entrenar</h3>
-              <p className="text-gray-600">
-                Atleta abre link, inicia entrenamiento, registra feedback y
-                peso. Datos sincronizan y aparecen en tu dashboard.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Beneficios */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Beneficios — Entrenador
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-700">
-                    Ahorro de tiempo en creación de rutinas
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-700">
-                    Centralización de rutinas, progreso y cobros
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-700">
-                    Feedback registrado y accionable
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Beneficios — Atleta
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-700">
-                    Acceso inmediato sin descargar
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-700">Interfaz click-only</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-700">
-                    Guarda progreso y ajusta carga fácilmente
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-12">Plan Base</h2>
-          <Card className="max-w-md mx-auto border-2 border-blue-600">
-            <CardContent className="p-8">
-              <div className="text-4xl font-bold text-gray-900 mb-2">$29</div>
-              <div className="text-gray-600 mb-6">por mes</div>
-              <div className="space-y-4 text-left mb-8">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span>Hasta 5 atletas activos</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span>Cobros vía MercadoPago sin comisión</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span>Historial completo</span>
-                </div>
-              </div>
-              <Button className="w-full" size="lg" asChild>
-                <Link href="/auth/register">Comenzar ahora</Link>
-              </Button>
-              <p className="text-sm text-gray-500 mt-4">
-                Upgrades: más atletas y más historial disponible
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 text-center mb-12">
-            Preguntas Frecuentes
-          </h2>
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                ¿El atleta necesita crear cuenta?
-              </h3>
-              <p className="text-gray-600">
-                No. Solo abre el link y usa la PWA.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                ¿El enlace puede revocarse?
-              </h3>
-              <p className="text-gray-600">
-                Sí. Admins pueden revocar o regenerar tokens desde el dashboard.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                ¿Se pierden datos si el atleta está offline?
-              </h3>
-              <p className="text-gray-600">
-                No. Se guarda localmente y se sincroniza al reconectar.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                ¿Cómo funcionan los pagos?
-              </h3>
-              <p className="text-gray-600">
-                Se genera un cobro en MercadoPago con alias y monto. El
-                entrenador administra cobros desde su panel.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                ¿Cuántos atletas por plan?
-              </h3>
-              <p className="text-gray-600">
-                Plan base: hasta 5 atletas. Se pueden comprar upgrades.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonios */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-gray-900 text-center mb-12">
-            Lo que dicen nuestros entrenadores
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <p className="text-gray-600 mb-4">
-                  &quot;Me ahorra horas por semana. Mis atletas ya no pierden
-                  entrenos.&quot;
-                </p>
-                <div className="font-semibold text-gray-900">
-                  — Carlos M., Entrenador Personal
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <p className="text-gray-600 mb-4">
-                  &quot;La facilidad para enviar rutinas por WhatsApp es
-                  increíble. Mis clientes están más comprometidos.&quot;
-                </p>
-                <div className="font-semibold text-gray-900">
-                  — Ana L., Preparadora Física
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-6">
-                <p className="text-gray-600 mb-4">
-                  &quot;El feedback en tiempo real me permite ajustar las
-                  rutinas al instante.&quot;
-                </p>
-                <div className="font-semibold text-gray-900">
-                  — Miguel R., Coach Deportivo
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Final */}
-      <section className="py-20 bg-blue-600 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold mb-6">
-            ¿Listo para revolucionar tu entrenamiento?
-          </h2>
-          <p className="text-xl mb-8 text-blue-100">
-            Únete a cientos de entrenadores que ya están usando GymBro Coach
-          </p>
-          <Button
-            size="lg"
-            variant="secondary"
-            className="text-lg px-8 py-4"
-            asChild
-          >
-            <Link href="/auth/register">
-              Comenzar ahora — Crear cuenta
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={32}
-                height={32}
-                className="object-contain"
+          <div className="divide-y divide-border-subtle">
+            {problemCards.map((card) => (
+              <ProblemItem
+                key={card.title}
+                icon={card.icon}
+                title={card.title}
+                text={card.text}
               />
-              <span className="text-xl font-bold">GymBro Coach</span>
-            </div>
-            <div className="flex gap-6 text-sm text-gray-400">
-              <Link href="#" className="hover:text-white">
-                Privacidad
-              </Link>
-              <Link href="#" className="hover:text-white">
-                Términos
-              </Link>
-              <Link
-                href="mailto:hola@gymbrocoach.com"
-                className="hover:text-white"
-              >
-                Contacto
-              </Link>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>© 2024 GymBro Coach. Todos los derechos reservados.</p>
+            ))}
           </div>
         </div>
-      </footer>
+      </Section>
+    </Reveal>
+  );
+}
+
+function HowItWorksSection() {
+  return (
+    <Reveal>
+      <Section id="como-funciona">
+        <SectionHeader
+          title="Como funciona Impruv"
+          text="Sin apps que instalar. Sin cuentas que crear. Sin explicarle nada raro a tu atleta."
+        />
+
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step) => (
+            <FeatureCard key={step.number}>
+              <div className="flex size-11 items-center justify-center rounded-app-lg bg-purple-primary text-lg font-black text-white shadow-purple-glow">
+                {step.number}
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-text-primary">
+                {step.title}
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-text-secondary">
+                {step.text}
+              </p>
+            </FeatureCard>
+          ))}
+        </div>
+
+        <div className="mt-8 rounded-app-xl border border-purple-primary/30 bg-purple-primary/10 p-5">
+          <p className="font-semibold text-text-primary">
+            Menos friccion para el atleta. Mas informacion util para vos.
+          </p>
+          <p className="mt-1 text-sm text-text-secondary">
+            El flujo esta pensado para que el atleta pueda entrenar desde el
+            celular sin crear cuenta.
+          </p>
+        </div>
+      </Section>
+    </Reveal>
+  );
+}
+
+function DifferentialSection() {
+  return (
+    <Reveal>
+      <Section id="diferencial">
+        <SectionHeader
+          title="La diferencia es simple: el atleta no tiene que hacer nada extra"
+          text="Muchas herramientas funcionan bien cuando el atleta adopta la app. El problema es que muchas veces no la descarga, no crea la cuenta o deja de usarla."
+          align="center"
+        />
+
+        <div className="mt-10 rounded-app-2xl border border-purple-primary/35 bg-bg-surface-1 p-6 text-center shadow-elevation-2 sm:p-10">
+          <p className="text-2xl font-extrabold text-text-primary sm:text-3xl">
+            Impruv reduce esa friccion al minimo.
+          </p>
+          <p className="mt-3 text-lg font-semibold text-purple-soft">
+            Tu atleta solo abre un link.
+          </p>
+          <p className="mt-1 text-sm text-text-secondary">
+            Sin app. Sin registro. Sin cuenta.
+          </p>
+        </div>
+
+        <div className="mt-8 overflow-x-auto rounded-app-xl border border-border-subtle bg-bg-surface-1">
+          <table className="w-full min-w-[520px] text-sm">
+            <thead>
+              <tr className="border-b border-border-subtle">
+                <th className="px-5 py-4 text-left font-medium text-text-muted" />
+                <th className="px-5 py-4 text-center font-bold text-purple-soft">Impruv</th>
+                <th className="px-5 py-4 text-center font-medium text-text-muted">Apps tradicionales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparisonRows.map(([feature, impruv, traditional], index) => (
+                <tr
+                  key={feature}
+                  className={index < comparisonRows.length - 1 ? "border-b border-border-subtle/60" : undefined}
+                >
+                  <td className="px-5 py-4 text-text-secondary">{feature}</td>
+                  <td className="px-5 py-4 text-center font-semibold text-purple-soft">{impruv}</td>
+                  <td className="px-5 py-4 text-center text-text-muted">{traditional}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+    </Reveal>
+  );
+}
+
+function AudienceSection() {
+  return (
+    <Reveal>
+      <Section id="para-quien">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+          <AudienceList title="Impruv es para vos si..." items={isFor} positive />
+          <AudienceList title="Impruv todavia no es para vos si..." items={isNotFor} />
+        </div>
+      </Section>
+    </Reveal>
+  );
+}
+
+function BuildSection() {
+  return (
+    <Reveal>
+      <Section>
+        <div className="rounded-app-2xl border border-border-subtle bg-bg-surface-1 p-8 shadow-elevation-3 sm:p-12">
+          <div className="max-w-3xl">
+            <LandingBadge>Lo que estamos construyendo</LandingBadge>
+            <h2 className="mt-5 text-3xl font-extrabold leading-tight text-text-primary sm:text-4xl">
+              Una herramienta simple para seguir mejor a tus atletas
+            </h2>
+            <p className="mt-5 text-base leading-8 text-text-secondary">
+              Impruv arranca con una idea concreta: que el coach pueda crear
+              rutinas, compartirlas facil y recibir datos reales de entrenamiento
+              sin perseguir al atleta.
+            </p>
+            <p className="mt-4 text-base leading-8 text-text-secondary">
+              Estamos trabajando tambien en senales simples para ayudarte a
+              detectar cuando un atleta alcanza el tope de un rango de reps y
+              puede ser momento de ajustar la carga.
+            </p>
+            <p className="mt-4 text-base leading-8 text-text-secondary">
+              Hoy estamos en beta. Queremos construir esto cerca de coaches que
+              realmente manejan atletas y entienden el problema.
+            </p>
+          </div>
+        </div>
+      </Section>
+    </Reveal>
+  );
+}
+
+function FinalCtaSection() {
+  return (
+    <Section id="cta">
+      <div
+        id="conversacion"
+        className="grid gap-10 rounded-app-2xl border border-border-subtle bg-bg-surface-1 p-6 shadow-elevation-3 sm:p-8 lg:grid-cols-[1fr_0.85fr] lg:p-12"
+      >
+        <div>
+          <LandingBadge>Beta gratuita</LandingBadge>
+          <h2 className="mt-5 max-w-xl text-3xl font-extrabold leading-tight text-text-primary sm:text-4xl">
+            Probalo esta semana
+          </h2>
+          <p className="mt-4 text-base leading-8 text-text-secondary">
+            Beta gratuita para los primeros coaches. Sin tarjeta, sin
+            compromiso.
+          </p>
+          <CtaForm />
+          <p className="mt-5 text-sm leading-6 text-text-muted">
+            Te contactamos personalmente. No es un bot ni un email automatico.
+            Queremos entender como trabajas antes de darte acceso a la beta.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <ProofCard title="Sin registro del atleta" text="No descarga nada. No crea cuenta." />
+          <ProofCard title="Pesos, reps y notas" text="Datos ordenados en el dashboard, sin capturas ni audios." />
+          <ProofCard title="Beta gratuita" text="Pensada para primeros coaches que quieran probar con atletas reales." />
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function LandingFooter() {
+  return (
+    <footer className="border-t border-border-subtle bg-bg-base">
+      <div className="mx-auto max-w-[1200px] px-5 py-10 sm:px-8">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <ImpruVWordmark size="sm" color="#F8FAFC" />
+            <p className="mt-3 text-sm text-text-muted">
+              Seguimiento real para coaches fitness. Solo un link de por medio.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-5 text-sm text-text-muted">
+            <a href="#como-funciona" className="transition hover:text-text-primary">Producto</a>
+            <a href="#cta" className="transition hover:text-text-primary">Acceso beta</a>
+            <a href="#conversacion" className="transition hover:text-text-primary">Contacto</a>
+            <Link href="/auth/login" className="transition hover:text-text-primary">Iniciar sesion</Link>
+          </div>
+        </div>
+        <div className="mt-8 flex flex-col gap-2 border-t border-border-subtle/40 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-text-muted">2026 Impruv - Terminos - Privacidad</p>
+          <p className="text-xs text-text-muted">Hecho para coaches que se toman en serio a sus atletas.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Local components (used only on this page) ────────────────────────────────
+
+function AudienceList({
+  title,
+  items,
+  positive,
+}: {
+  title: string;
+  items: string[];
+  positive?: boolean;
+}) {
+  const Icon = positive ? CheckCircle2 : X;
+
+  return (
+    <div>
+      <h2 className="text-3xl font-extrabold leading-tight text-text-primary sm:text-4xl">
+        {title}
+      </h2>
+      <div className="mt-8 space-y-3">
+        {items.map((item) => (
+          <div
+            key={item}
+            className="flex items-start gap-3 rounded-app-lg border border-border-subtle bg-bg-surface-1 p-4"
+          >
+            <Icon
+              className={`mt-0.5 size-5 shrink-0 ${positive ? "text-success" : "text-text-muted"}`}
+            />
+            <p className={positive ? "text-sm text-text-secondary" : "text-sm text-text-muted"}>
+              {item}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

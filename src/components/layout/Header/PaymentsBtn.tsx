@@ -12,7 +12,7 @@ import { CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
-import { Athlete } from "@/types/athleteType";
+import type { AthleteLite } from "@/types/athleteType";
 
 const PaymentsBtn = () => {
   const [paymentsOpen, setPaymentsOpen] = useState(false);
@@ -20,7 +20,7 @@ const PaymentsBtn = () => {
 
   // Count overdue payments (30 days)
   const overduePaymentsCount =
-    athletes?.filter((athlete: Athlete) => {
+    athletes?.filter((athlete: AthleteLite) => {
       if (athlete.paymentDate === "") return true;
       const lastPayment = new Date(athlete.paymentDate);
       const today = new Date();
@@ -31,7 +31,7 @@ const PaymentsBtn = () => {
     }).length || 0;
 
   // List of overdue payments (30 days)
-  const overduePaymentsList = athletes?.filter((athlete: Athlete) => {
+  const overduePaymentsList = athletes?.filter((athlete: AthleteLite) => {
     if (athlete.paymentDate === "") return true;
     const lastPayment = new Date(athlete.paymentDate);
     const today = new Date();
@@ -62,7 +62,7 @@ const PaymentsBtn = () => {
         </DialogHeader>
         <div className="space-y-2 max-h-60 overflow-y-auto">
           {overduePaymentsCount > 0 ? (
-            overduePaymentsList?.map((athlete: Athlete) => (
+            overduePaymentsList?.map((athlete: AthleteLite) => (
               <div
                 key={athlete.id}
                 className="border p-2 rounded-md border-gray-200 flex-col justify-between items-center gap-2"

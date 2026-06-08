@@ -12,17 +12,17 @@ const DashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <main className="flex min-h-screen flex-col gap-4 pt-16">
-      {/* Encabezado con buscador y CTA para crear atletas */}
-      <DashboardHeader
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+    <main className="app-page">
+      <div className="app-container app-safe-bottom relative flex flex-col gap-5 py-6 lg:py-8">
+        <DashboardHeader
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
 
-      {/* Grid filtrable de atletas */}
-      <section className="flex-1 overflow-y-auto pb-6">
-        <AthleteGrid searchQuery={searchQuery} />
-      </section>
+        <section className="flex-1 overflow-y-auto">
+          <AthleteGrid searchQuery={searchQuery} />
+        </section>
+      </div>
     </main>
   );
 };

@@ -10,6 +10,7 @@ import { useGetAllAthletes } from "@/hooks/useGetAllAthletes";
 interface PaymentStatusCardProps {
   athleteId: string;
   paymentDate: string;
+  onPaymentSaved?: () => Promise<void> | void;
 }
 
 interface PaymentStatus {
@@ -24,15 +25,19 @@ interface PaymentStatus {
 const PAYMENT_WINDOW_DAYS = 30;
 const PAYMENT_GRACE_DAYS = 7;
 const STATUS_STYLES = {
-  positive: { badge: "bg-primary/10 text-green-600", text: "text-green-600" },
-  warning: { badge: "bg-secondary/10 text-secondary-foreground", text: "text-secondary-foreground" },
-  negative: { badge: "bg-destructive/10 text-destructive", text: "text-destructive" },
+  positive: { badge: "border-success/25 bg-success/10 text-success", text: "text-success" },
+  warning: { badge: "border-warning/25 bg-warning/10 text-warning", text: "text-warning" },
+  negative: { badge: "border-danger/25 bg-danger/10 text-danger", text: "text-danger" },
 } as const;
 
 /**
  * Muestra el estado de pago del atleta y permite marcar un pago nuevo.
  */
-const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) => {
+const PaymentStatusCard = ({
+  athleteId,
+  paymentDate,
+  onPaymentSaved,
+}: PaymentStatusCardProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const { mutate } = useGetAllAthletes();
 
@@ -42,7 +47,7 @@ const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) =
         label: "Aún no pagó",
         tone: "negative",
         badgeClass: STATUS_STYLES.negative.badge,
-        icon: <XCircle className="h-4 w-4 text-destructive" />,
+        icon: <XCircle className="size-4 text-danger" />,
         helperText: "Sin pagos registrados",
       };
     }
@@ -58,7 +63,7 @@ const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) =
         label: "Pago vencido",
         tone: "negative",
         badgeClass: STATUS_STYLES.negative.badge,
-        icon: <AlertCircle className="h-4 w-4 text-destructive" />,
+        icon: <AlertCircle className="size-4 text-danger" />,
         helperText: `Vencido hace ${
           daysSincePayment - PAYMENT_WINDOW_DAYS
         } días`,
@@ -71,7 +76,7 @@ const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) =
         label: "Pago próximo a vencer",
         tone: "warning",
         badgeClass: STATUS_STYLES.warning.badge,
-        icon: <AlertCircle className="h-4 w-4 text-secondary-foreground" />,
+        icon: <AlertCircle className="size-4 text-warning" />,
         helperText: `Vence en ${
           PAYMENT_WINDOW_DAYS - daysSincePayment
         } días`,
@@ -83,7 +88,7 @@ const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) =
       label: "Pago al día",
       tone: "positive",
       badgeClass: STATUS_STYLES.positive.badge,
-      icon: <CheckCircle className="h-4 w-4 text-green-600" />,
+        icon: <CheckCircle className="size-4 text-success" />,
       helperText: `Último pago: ${lastPayment.toLocaleDateString("es-ES")}`,
     };
   }, [paymentDate]);
@@ -93,24 +98,25 @@ const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) =
 
     const response = await updatePaymentDate(athleteId, new Date().toISOString());
     if (response.ok) {
-      mutate();
+      await mutate();
+      await onPaymentSaved?.();
     }
 
     setIsUpdating(false);
   };
 
   return (
-    <section className="space-y-4 rounded-lg border border-border bg-card p-4">
+    <section className="space-y-4 rounded-app-2xl border border-border-subtle bg-bg-surface-1 p-5 shadow-elevation-2">
       <header className="flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Calendar className="h-4 w-4" /> Estado de pago
+        <h3 className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+          <Calendar className="size-4" /> Estado de pago
         </h3>
         <Badge variant="secondary" className={status.badgeClass}>
           {status.label}
         </Badge>
       </header>
 
-      <div className="space-y-2 text-sm text-muted-foreground">
+      <div className="space-y-2 text-sm text-text-secondary">
         <div className="flex items-center gap-2">
           {status.icon}
           <span
@@ -127,7 +133,7 @@ const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) =
         </div>
 
         {status.highlight && (
-          <p className="rounded-md border border-border bg-muted p-2 text-xs text-destructive">
+          <p className="rounded-app-xl border border-danger/25 bg-danger/10 p-3 text-xs text-danger">
             {status.highlight}
           </p>
         )}
@@ -136,7 +142,7 @@ const PaymentStatusCard = ({ athleteId, paymentDate }: PaymentStatusCardProps) =
       <Button
         variant="outline"
         size="sm"
-        className="w-full"
+        className="w-full rounded-app-full"
         disabled={isUpdating}
         onClick={handleSetPaymentToday}
       >

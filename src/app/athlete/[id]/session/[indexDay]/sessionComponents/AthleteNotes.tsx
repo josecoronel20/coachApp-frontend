@@ -28,40 +28,51 @@ const AthleteNotes = ({
 
   return (
     <div className="w-full pb-16">
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
-          <span className="text-sm">Dejar un comentario</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Tuviste alguna dificultad con el ejercicio?</DialogTitle>
-        </DialogHeader>
-        <Textarea
-          value={noteText}
-          rows={3}
-          onChange={(e) => setNoteText(e.target.value)}
-          placeholder="Escribe tu comentario aquí..."
-        />
-        <div className="flex justify-end gap-2 mt-4">
-          <Button 
-            variant="outline" 
-            onClick={() => setOpen(false)}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-full rounded-full border-border-strong bg-bg-surface-2 text-text-secondary hover:bg-bg-surface-3 hover:text-text-primary"
           >
-            Cancelar
+            <span className="text-sm">
+              {noteText ? "Ver / editar comentario" : "Dejar un comentario"}
+            </span>
           </Button>
-          <Button 
-            onClick={() => {
-              onNotesChange?.(noteText);
-              setOpen(false);
-            }}
-          >
-            Guardar
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog></div>
+        </DialogTrigger>
+        <DialogContent className="border-border-subtle bg-bg-surface-2">
+          <DialogHeader>
+            <DialogTitle className="text-text-primary">
+              ¿Tuviste alguna dificultad con el ejercicio?
+            </DialogTitle>
+          </DialogHeader>
+          <Textarea
+            value={noteText}
+            rows={3}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="Escribí tu comentario acá..."
+            className="select-text border-border-strong bg-bg-surface-1 text-text-primary placeholder:text-text-muted"
+          />
+          <div className="mt-4 flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="rounded-full border-border-strong bg-bg-surface-1 text-text-secondary hover:text-text-primary"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                onNotesChange?.(noteText);
+                setOpen(false);
+              }}
+              className="rounded-full bg-purple-primary text-white hover:opacity-90"
+            >
+              Guardar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

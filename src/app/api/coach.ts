@@ -1,8 +1,8 @@
-import { NewAthlete } from "@/types/athleteType";
+import { CreateAthleteBody } from "@/types/athleteType";
+import { requireApiUrl } from "@/config/env";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const createNewAthlete = async (data: NewAthlete) => {
+const createNewAthlete = async (data: CreateAthleteBody) => {
+    const API_URL = requireApiUrl();
     const response = await fetch(`${API_URL}/api/coach/newAthlete`, {
         method: "POST",
         headers: {
@@ -15,6 +15,7 @@ const createNewAthlete = async (data: NewAthlete) => {
 };
 
 const getAthleteInfo = async (id: string) => {
+    const API_URL = requireApiUrl();
     const response = await fetch(`${API_URL}/api/coach/getAthleteInfo/${id}`, {
         method: "GET",
         credentials: "include",
@@ -26,6 +27,7 @@ const getAthleteInfo = async (id: string) => {
 };
 
 const getAllAthletes = async () => {
+    const API_URL = requireApiUrl();
     const response = await fetch(`${API_URL}/api/coach/getAllAthletes`, {
         method: "GET",
         credentials: "include",

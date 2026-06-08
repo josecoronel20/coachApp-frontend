@@ -2,14 +2,14 @@
 
 import AthleteInfoCard from "./AthleteInfoCard";
 import PaymentStatusCard from "./PaymentStatusCard";
-import AthleteDietCard from "./AthleteDietCard";
 import { DeleteButton } from "@/components/reusable/DeleteButton";
 import type { Athlete } from "@/types/athleteType";
 
 interface AthleteSummarySidebarProps {
   athlete: Athlete;
   onDelete: () => Promise<void> | void;
-  onDietSaved?: () => void;
+  onPaymentSaved?: () => Promise<void> | void;
+  onAthleteUpdated?: () => Promise<void> | void;
 }
 
 /**
@@ -18,17 +18,17 @@ interface AthleteSummarySidebarProps {
 const AthleteSummarySidebar = ({
   athlete,
   onDelete,
-  onDietSaved,
+  onPaymentSaved,
+  onAthleteUpdated,
 }: AthleteSummarySidebarProps) => {
   return (
     <aside className="space-y-4">
-      <AthleteInfoCard athlete={athlete} />
-      <AthleteDietCard
+      <AthleteInfoCard athlete={athlete} onRepsTrackedSaved={onAthleteUpdated} />
+      <PaymentStatusCard
         athleteId={athlete.id}
-        initialDiet={athlete.diet ?? ""}
-        onDietSaved={onDietSaved}
+        paymentDate={athlete.paymentDate}
+        onPaymentSaved={onPaymentSaved}
       />
-      <PaymentStatusCard athleteId={athlete.id} paymentDate={athlete.paymentDate} />
       <DeleteButton label="atleta" handleDelete={onDelete} />
     </aside>
   );

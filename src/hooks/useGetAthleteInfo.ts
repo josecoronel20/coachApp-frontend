@@ -1,7 +1,9 @@
 import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
+import { requireApiUrl } from "@/config/env";
 
 export const useGetAthleteInfo = (id: string) => {
-    const {data,mutate,isLoading,error} = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/coach/getAthleteInfo/${id}`, fetcher)
+    const API_URL = requireApiUrl();
+    const {data,mutate,isLoading,error} = useSWR(`${API_URL}/api/coach/getAthleteInfo/${id}`, fetcher)
     return {data,mutate,isLoading,error}
 }
